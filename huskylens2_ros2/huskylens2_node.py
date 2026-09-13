@@ -97,7 +97,7 @@ _ALGO_MAP = {
 }
 
 
-class HuskyLensNode(Node):
+class HuskyLens2Node(Node):
 
     def __init__(self):
         super().__init__('huskylens_node')
@@ -108,8 +108,8 @@ class HuskyLensNode(Node):
         self.declare_parameter('algorithm',   'object_recognition')
         self.declare_parameter('poll_rate',   10.0)
         self.declare_parameter('frame_id',    'camera_link')
-        self.declare_parameter('image_width',  320)
-        self.declare_parameter('image_height', 240)
+        self.declare_parameter('image_width',  640)
+        self.declare_parameter('image_height', 480)
 
         bus      = self.get_parameter('i2c_bus').value
         addr     = self.get_parameter('i2c_address').value
@@ -118,6 +118,9 @@ class HuskyLensNode(Node):
         self._frame_id = self.get_parameter('frame_id').value
         self._img_w    = self.get_parameter('image_width').value
         self._img_h    = self.get_parameter('image_height').value
+
+        self.get_logger().info(f'HuskyLens 2 ROS 2 node starting with algorithm: "{algo_str}" @ {rate:.0f} Hz')
+        self.get_logger().info(f'I2C bus: {bus}, address: 0x{addr:02X}, frame_id: {self._frame_id}, image size: {self._img_w}x{self._img_h}')
 
         # --- I2C connection ---------------------------------------------------
         self.get_logger().info(f'Connecting to HuskyLens 2 on I2C bus={bus} addr=0x{addr:02X}...')
