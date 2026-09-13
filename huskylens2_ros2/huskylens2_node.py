@@ -247,6 +247,7 @@ class HuskyLens2Node(Node):
         result.width = float(getattr(block, 'width', 0))
         result.height = float(getattr(block, 'height', 0))
         result.id = int(getattr(block, 'ID', getattr(block, 'id', 0)))
+        result.class_id = str(getattr(block, 'class_id', getattr(block, 'name', '')))
         return result
 
     def _poll(self):
@@ -279,7 +280,8 @@ class HuskyLens2Node(Node):
             d.bbox.size_y = float(r.height)
 
             hyp = ObjectHypothesisWithPose()
-            hyp.hypothesis.class_id = str(r.id)
+            #hyp.hypothesis.class_id = str(r.id)
+            hyp.hypothesis.class_id = r.class_id
             hyp.hypothesis.score    = 1.0
             d.results.append(hyp)
             det_array.detections.append(d)
