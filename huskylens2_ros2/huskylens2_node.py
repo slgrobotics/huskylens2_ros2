@@ -52,6 +52,8 @@ Notes about the MCP Server (HuskyLens 2 Plus Kit with Wi-Fi):
 """
 
 import math
+from types import SimpleNamespace
+
 import rclpy
 from rclpy.executors import ExternalShutdownException
 from rclpy.node import Node
@@ -60,42 +62,81 @@ from geometry_msgs.msg import Point
 from std_msgs.msg import String
 from vision_msgs.msg import Detection2D, Detection2DArray, ObjectHypothesisWithPose
 
-from huskylens2_ros2.dfrobot_huskylens_i2c import (
-    HuskyLensI2C, ALGO_NAMES,
-    ALGO_FACE_RECOGNITION, ALGO_OBJECT_TRACKING, ALGO_OBJECT_RECOGNITION,
-    ALGO_LINE_TRACKING, ALGO_COLOR_RECOGNITION, ALGO_TAG_RECOGNITION,
-    ALGO_GESTURE_RECOGNITION, ALGO_POSE_RECOGNITION, ALGO_HAND_RECOGNITION,
-    ALGO_OCR_RECOGNITION, ALGO_QRCODE_RECOGNITION, ALGO_BARCODE_RECOGNITION,
-)
+try:
+    import pyhuskylens as pyhuskylens_module
+    from pyhuskylens import HuskyLens
+    _HAS_PYHUSKYLENS = True
+except ImportError:  # pragma: no cover - fallback only for environments without the library
+    pyhuskylens_module = None
+    HuskyLens = None
+    _HAS_PYHUSKYLENS = False
 
-# Name -> algorithm constant map
-_ALGO_MAP = {
-    'face':         ALGO_FACE_RECOGNITION,
-    'face_recognition': ALGO_FACE_RECOGNITION,
-    'object':       ALGO_OBJECT_RECOGNITION,
-    'object_recognition': ALGO_OBJECT_RECOGNITION,
-    'tracking':     ALGO_OBJECT_TRACKING,
-    'object_tracking': ALGO_OBJECT_TRACKING,
-    'line':         ALGO_LINE_TRACKING,
-    'line_tracking': ALGO_LINE_TRACKING,
-    'color':        ALGO_COLOR_RECOGNITION,
-    'color_recognition': ALGO_COLOR_RECOGNITION,
-    'tag':          ALGO_TAG_RECOGNITION,
-    'tag_recognition': ALGO_TAG_RECOGNITION,
-    'gesture':      ALGO_GESTURE_RECOGNITION,
-    'gesture_recognition': ALGO_GESTURE_RECOGNITION,
-    'pose':         ALGO_POSE_RECOGNITION,
-    'pose_recognition': ALGO_POSE_RECOGNITION,
-    'hand':         ALGO_HAND_RECOGNITION,
-    'hand_recognition': ALGO_HAND_RECOGNITION,
-    'ocr':          ALGO_OCR_RECOGNITION,
-    'ocr_recognition': ALGO_OCR_RECOGNITION,
-    'qr':           ALGO_QRCODE_RECOGNITION,
-    'qrcode':       ALGO_QRCODE_RECOGNITION,
-    'qrcode_recognition': ALGO_QRCODE_RECOGNITION,
-    'barcode':      ALGO_BARCODE_RECOGNITION,
-    'barcode_recognition': ALGO_BARCODE_RECOGNITION,
-}
+if _HAS_PYHUSKYLENS:
+    _ALGO_MAP = {
+        'face': getattr(pyhuskylens_module, 'ALGORITHM_FACE_RECOGNITION', None),
+        'face_recognition': getattr(pyhuskylens_module, 'ALGORITHM_FACE_RECOGNITION', None),
+        'object': getattr(pyhuskylens_module, 'ALGORITHM_OBJECT_RECOGNITION', None),
+        'object_recognition': getattr(pyhuskylens_module, 'ALGORITHM_OBJECT_RECOGNITION', None),
+        'tracking': getattr(pyhuskylens_module, 'ALGORITHM_OBJECT_TRACKING', None),
+        'object_tracking': getattr(pyhuskylens_module, 'ALGORITHM_OBJECT_TRACKING', None),
+        'line': getattr(pyhuskylens_module, 'ALGORITHM_LINE_TRACKING', None),
+        'line_tracking': getattr(pyhuskylens_module, 'ALGORITHM_LINE_TRACKING', None),
+        'color': getattr(pyhuskylens_module, 'ALGORITHM_COLOR_RECOGNITION', None),
+        'color_recognition': getattr(pyhuskylens_module, 'ALGORITHM_COLOR_RECOGNITION', None),
+        'tag': getattr(pyhuskylens_module, 'ALGORITHM_TAG_RECOGNITION', None),
+        'tag_recognition': getattr(pyhuskylens_module, 'ALGORITHM_TAG_RECOGNITION', None),
+        'gesture': getattr(pyhuskylens_module, 'ALGORITHM_GESTURE_RECOGNITION', None),
+        'gesture_recognition': getattr(pyhuskylens_module, 'ALGORITHM_GESTURE_RECOGNITION', None),
+        'pose': getattr(pyhuskylens_module, 'ALGORITHM_POSE_RECOGNITION', None),
+        'pose_recognition': getattr(pyhuskylens_module, 'ALGORITHM_POSE_RECOGNITION', None),
+        'hand': getattr(pyhuskylens_module, 'ALGORITHM_HAND_RECOGNITION', None),
+        'hand_recognition': getattr(pyhuskylens_module, 'ALGORITHM_HAND_RECOGNITION', None),
+        'ocr': getattr(pyhuskylens_module, 'ALGORITHM_OCR_RECOGNITION', None),
+        'ocr_recognition': getattr(pyhuskylens_module, 'ALGORITHM_OCR_RECOGNITION', None),
+        'qr': getattr(pyhuskylens_module, 'ALGORITHM_QRCODE_RECOGNITION', None),
+        'qrcode': getattr(pyhuskylens_module, 'ALGORITHM_QRCODE_RECOGNITION', None),
+        'qrcode_recognition': getattr(pyhuskylens_module, 'ALGORITHM_QRCODE_RECOGNITION', None),
+        'barcode': getattr(pyhuskylens_module, 'ALGORITHM_BARCODE_RECOGNITION', None),
+        'barcode_recognition': getattr(pyhuskylens_module, 'ALGORITHM_BARCODE_RECOGNITION', None),
+    }
+    _ALGO_MAP = {k: v for k, v in _ALGO_MAP.items() if v is not None}
+    ALGO_NAMES = {v: k for k, v in _ALGO_MAP.items()}
+else:
+    from huskylens2_ros2.dfrobot_huskylens_i2c import (
+        HuskyLensI2C, ALGO_NAMES,
+        ALGO_FACE_RECOGNITION, ALGO_OBJECT_TRACKING, ALGO_OBJECT_RECOGNITION,
+        ALGO_LINE_TRACKING, ALGO_COLOR_RECOGNITION, ALGO_TAG_RECOGNITION,
+        ALGO_GESTURE_RECOGNITION, ALGO_POSE_RECOGNITION, ALGO_HAND_RECOGNITION,
+        ALGO_OCR_RECOGNITION, ALGO_QRCODE_RECOGNITION, ALGO_BARCODE_RECOGNITION,
+    )
+
+    _ALGO_MAP = {
+        'face':         ALGO_FACE_RECOGNITION,
+        'face_recognition': ALGO_FACE_RECOGNITION,
+        'object':       ALGO_OBJECT_RECOGNITION,
+        'object_recognition': ALGO_OBJECT_RECOGNITION,
+        'tracking':     ALGO_OBJECT_TRACKING,
+        'object_tracking': ALGO_OBJECT_TRACKING,
+        'line':         ALGO_LINE_TRACKING,
+        'line_tracking': ALGO_LINE_TRACKING,
+        'color':        ALGO_COLOR_RECOGNITION,
+        'color_recognition': ALGO_COLOR_RECOGNITION,
+        'tag':          ALGO_TAG_RECOGNITION,
+        'tag_recognition': ALGO_TAG_RECOGNITION,
+        'gesture':      ALGO_GESTURE_RECOGNITION,
+        'gesture_recognition': ALGO_GESTURE_RECOGNITION,
+        'pose':         ALGO_POSE_RECOGNITION,
+        'pose_recognition': ALGO_POSE_RECOGNITION,
+        'hand':         ALGO_HAND_RECOGNITION,
+        'hand_recognition': ALGO_HAND_RECOGNITION,
+        'ocr':          ALGO_OCR_RECOGNITION,
+        'ocr_recognition': ALGO_OCR_RECOGNITION,
+        'qr':           ALGO_QRCODE_RECOGNITION,
+        'qrcode':       ALGO_QRCODE_RECOGNITION,
+        'qrcode_recognition': ALGO_QRCODE_RECOGNITION,
+        'barcode':      ALGO_BARCODE_RECOGNITION,
+        'barcode_recognition': ALGO_BARCODE_RECOGNITION,
+    }
 
 
 class HuskyLens2Node(Node):
@@ -126,11 +167,16 @@ class HuskyLens2Node(Node):
         # --- I2C connection ---------------------------------------------------
         self.get_logger().info(f'Connecting to HuskyLens 2 on I2C bus={bus} addr=0x{addr:02X}...')
         try:
-            self._hl = HuskyLensI2C(bus, addr)
-            if not self._hl.begin():
-                self.get_logger().error('Could not communicate with the HuskyLens 2. '
-                                        'Check the I2C wiring and address.')
-                raise RuntimeError('HuskyLens init failed')
+            if _HAS_PYHUSKYLENS:
+                self._hl = HuskyLens(bus)
+                self._using_pyhuskylens = True
+            else:
+                self._hl = HuskyLensI2C(bus, addr)
+                self._using_pyhuskylens = False
+                if not self._hl.begin():
+                    self.get_logger().error('Could not communicate with the HuskyLens 2. '
+                                            'Check the I2C wiring and address.')
+                    raise RuntimeError('HuskyLens init failed')
             self.get_logger().info('[OK] HuskyLens 2 connected')
         except Exception as e:
             self.get_logger().error(f'[ERROR] Connection error: {e}')
@@ -162,7 +208,15 @@ class HuskyLens2Node(Node):
             'MCP Server (via Wi-Fi): configure it on the device -> Settings -> MCP Server')
 
     def _set_algorithm(self, algo_id: int) -> bool:
-        ok = self._hl.set_algorithm(algo_id)
+        if self._using_pyhuskylens:
+            try:
+                self._hl.set_alg(algo_id)
+                ok = True
+            except Exception:
+                ok = False
+        else:
+            ok = self._hl.set_algorithm(algo_id)
+
         name = ALGO_NAMES.get(algo_id, str(algo_id))
         if ok:
             self._current_algo_id   = algo_id
@@ -183,10 +237,24 @@ class HuskyLens2Node(Node):
             return
         self._set_algorithm(algo_id)
 
+    def _block_to_legacy_result(self, block):
+        result = SimpleNamespace()
+        result.is_block = True
+        result.x_center = float(getattr(block, 'x', 0))
+        result.y_center = float(getattr(block, 'y', 0))
+        result.width = float(getattr(block, 'width', 0))
+        result.height = float(getattr(block, 'height', 0))
+        result.id = int(getattr(block, 'ID', getattr(block, 'id', 0)))
+        return result
+
     def _poll(self):
         """Requests results and publishes them."""
         try:
-            results = self._hl.get_results()
+            if self._using_pyhuskylens:
+                blocks = self._hl.get_blocks()
+                results = [self._block_to_legacy_result(block) for block in blocks]
+            else:
+                results = self._hl.get_results()
         except Exception as e:
             self.get_logger().warn(f'Error reading HuskyLens: {e}', throttle_duration_sec=5.0)
             return

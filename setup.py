@@ -14,7 +14,7 @@ setup(
         ('share/' + package_name + '/launch', glob('launch/*.launch.py')),
         ('share/' + package_name + '/config', glob('config/*.yaml')),
     ],
-    install_requires=['setuptools'],
+    install_requires=['setuptools', 'pyhuskylens'],
     zip_safe=True,
     maintainer='TODO Maintainer',
     maintainer_email='maintainer@example.com',
