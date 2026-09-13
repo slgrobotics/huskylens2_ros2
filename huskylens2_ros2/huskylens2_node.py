@@ -53,6 +53,7 @@ Notes about the MCP Server (HuskyLens 2 Plus Kit with Wi-Fi):
 
 import math
 import rclpy
+from rclpy.executors import ExternalShutdownException
 from rclpy.node import Node
 
 from geometry_msgs.msg import Point

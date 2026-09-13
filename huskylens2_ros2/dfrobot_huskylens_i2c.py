@@ -9,7 +9,7 @@ Origin (and credits to):
 https://github.com/irayfuego/robotica/blob/main/src/huskylens2_ros2/huskylens2_ros2/dfrobot_huskylens_i2c.py
 
 I2C protocol:
-    Default address: 0x32
+    Default address: 0x50
     UART/I2C commands: [0x55][0xAA][0x11][LEN][CMD][...DATA...][CHECKSUM]
 """
 
@@ -25,7 +25,7 @@ except ImportError:
 
 
 # --- Protocol constants ----------------------------------------------------
-_I2C_ADDR    = 0x32
+_I2C_ADDR    = 0x50
 _FRAME_HEAD  = [0x55, 0xAA, 0x11]
 
 # Commands
