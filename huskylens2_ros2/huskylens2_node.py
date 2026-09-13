@@ -278,7 +278,7 @@ class HuskyLens2Node(Node):
             d.bbox.center.position.y = float(r.y_center)
             d.bbox.size_x = float(r.width)
             d.bbox.size_y = float(r.height)
-            d.id = r.id
+            d.id = str(r.id)
 
             hyp = ObjectHypothesisWithPose()
             hyp.hypothesis.class_id = r.class_id
