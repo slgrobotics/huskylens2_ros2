@@ -101,6 +101,7 @@ if _HAS_PYHUSKYLENS:
     }
     _ALGO_MAP = {k: v for k, v in _ALGO_MAP.items() if v is not None}
     ALGO_NAMES = {v: k for k, v in _ALGO_MAP.items()}
+    _DEFAULT_ALGO_ID = _ALGO_MAP.get('object_recognition', next(iter(_ALGO_MAP.values())))
 else:
     from huskylens2_ros2.dfrobot_huskylens_i2c import (
         HuskyLensI2C, ALGO_NAMES,
@@ -137,6 +138,7 @@ else:
         'barcode':      ALGO_BARCODE_RECOGNITION,
         'barcode_recognition': ALGO_BARCODE_RECOGNITION,
     }
+    _DEFAULT_ALGO_ID = ALGO_OBJECT_RECOGNITION
 
 
 class HuskyLens2Node(Node):
@@ -183,7 +185,7 @@ class HuskyLens2Node(Node):
             raise
 
         # --- Initial algorithm -------------------------------------------------
-        self._current_algo_id   = _ALGO_MAP.get(algo_str, ALGO_OBJECT_RECOGNITION)
+        self._current_algo_id   = _ALGO_MAP.get(algo_str, _DEFAULT_ALGO_ID)
         self._current_algo_name = algo_str
         self._set_algorithm(self._current_algo_id)
 
