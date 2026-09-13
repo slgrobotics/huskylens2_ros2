@@ -1,3 +1,9 @@
 huskylens2_node:
   ros__parameters:
-    frame_id: huskylens2_link
+    frame_id:     huskylens2_link
+    i2c_bus:      1        # Raspberry Pi I2C bus (1 = /dev/i2c-1 on RPi4)
+    i2c_address:  0x50     # Default DFRobot SEN0638 address
+    algorithm:    'object_recognition'  # Can be overridden in the launch file
+    poll_rate:    10.0     # Hz
+    image_width:  320      # Reference resolution used to normalize coordinates
+    image_height: 240
