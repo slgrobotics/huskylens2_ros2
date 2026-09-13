@@ -1,0 +1,3 @@
+huskylens2_node:
+  ros__parameters:
+    frame_id: huskylens2_link
