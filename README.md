@@ -31,7 +31,13 @@ To run the MCP Server client node on Raspberry Pi or Workstation directly:
 
 ```bash
 ros2 run huskylens2_ros2 huskylens2_mcp_node
+
+  or
+
+ros2 launch huskylens2_ros2 huskylens2_mcp.launch.py \
+  mcp_server:=http://172.17.1.165:3000 algorithm_id:=2
 ```
+
 
 To use another parameter file:
 

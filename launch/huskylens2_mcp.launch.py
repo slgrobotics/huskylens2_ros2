@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
 """
-huskylens2.launch.py - launch HuskyLens 2 node
+huskylens2_mcp.launch.py - launch the LAN-based HuskyLens 2 MCP node
 
 Examples:
-  ros2 launch huskylens2_ros2 huskylens2.launch.py
-  ros2 launch huskylens2_ros2 huskylens2.launch.py algorithm:=face
+    ros2 launch huskylens2_ros2 huskylens2_mcp.launch.py
+    ros2 launch huskylens2_ros2 huskylens2_mcp.launch.py mcp_server:=http://172.17.1.165:3000
 """
 
 import os
@@ -25,9 +25,17 @@ def generate_launch_description():
                     'Values: face, object, tracking, line, color, tag, '
                     'gesture, pose, hand, ocr, qr, barcode')
 
+    algorithm_id_arg = DeclareLaunchArgument(
+        'algorithm_id', default_value='2',
+        description='HuskyLens application ID passed to the MCP tool')
+
+    mcp_server_arg = DeclareLaunchArgument(
+        'mcp_server', default_value='http://huskylens.local:3000',
+        description='HuskyLens MCP server base URL, without /sse')
+
     poll_rate_arg = DeclareLaunchArgument(
         'poll_rate', default_value='10.0',
-        description='I2C read frequency in Hz')
+        description='MCP request frequency in Hz')
 
     config_arg = DeclareLaunchArgument(
         'params_file',
@@ -43,6 +51,8 @@ def generate_launch_description():
             LaunchConfiguration('params_file'),
             {
                 'algorithm':  LaunchConfiguration('algorithm'),
+                'algorithm_id': LaunchConfiguration('algorithm_id'),
+                'mcp_server': LaunchConfiguration('mcp_server'),
                 'poll_rate':  LaunchConfiguration('poll_rate'),
             },
         ],
@@ -50,6 +60,8 @@ def generate_launch_description():
 
     return LaunchDescription([
         algorithm_arg,
+        algorithm_id_arg,
+        mcp_server_arg,
         poll_rate_arg,
         config_arg,
         huskylens_node,
