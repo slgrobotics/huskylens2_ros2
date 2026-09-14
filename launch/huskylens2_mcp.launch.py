@@ -4,7 +4,7 @@ huskylens2_mcp.launch.py - launch the LAN-based HuskyLens 2 MCP node
 
 Examples:
     ros2 launch huskylens2_ros2 huskylens2_mcp.launch.py
-    ros2 launch huskylens2_ros2 huskylens2_mcp.launch.py mcp_server:=http://172.17.1.165:3000
+    ros2 launch huskylens2_ros2 huskylens2_mcp.launch.py mcp_server:=http://huskylens.local:3000
 """
 
 import os

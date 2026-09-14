@@ -35,7 +35,7 @@ ros2 run huskylens2_ros2 huskylens2_mcp_node
   or
 
 ros2 launch huskylens2_ros2 huskylens2_mcp.launch.py \
-  mcp_server:=http://172.17.1.165:3000 algorithm_id:=2
+  mcp_server:=http://huskylens.local:3000 algorithm_id:=2
 ```
 
 
@@ -44,3 +44,15 @@ To use another parameter file:
 ```bash
 ros2 launch huskylens2_ros2 huskylens2.launch.py params_file:=/absolute/path/to/config.yaml
 ```
+
+**Note:**
+- you have to use actual IP address in place of *"huskylens.local"*, unless you put it in `/etc/hosts`
+- there is no way of setting a *static* IP address using HuskyLens 2 on-screen menus.
+- most routers allow you to assign a specific IP address to a device based on its MAC address. 
+To see MAC address for your *HuskyLens 2*:
+```
+ping -c <actual IP addr>
+ip neigh show
+192.68.1.160 dev eno1 lladdr 88:31:39:65:34:64 REACHABLE
+```
+The `88:31:39:65:34:64` will be the MAC address you can use in your router's "Reserve addresses" (or similar) setup.

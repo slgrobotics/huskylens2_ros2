@@ -12,8 +12,8 @@ Usage:
     python3 mcp_capture_aiohttp.py
 
 Output:
-    Connecting to HuskyLens 2 MCP Server at http://172.17.1.165:3000...
-    Session established. Message endpoint: http://172.17.1.165:3000/message?session_id=76d1f93a-ddb9-1c5b-9b9b-743f105033ab
+    Connecting to HuskyLens 2 MCP Server at http://huskylens.local:3000...
+    Session established. Message endpoint: http://huskylens.local:3000/message?session_id=76d1f93a-ddb9-1c5b-9b9b-743f105033ab
     Sending initialization request...
     Initialization response received: {'jsonrpc': '2.0', 'id': 1, 'result': {'protocolVersion': '2024-11-05', 'capabilities': {'tools': {}}, 'serverInfo': {'name': 'Huskylens MCP Server', 'version': '1.0.1'}}}
     Requesting frame and recognition data from HuskyLens 2...
@@ -54,7 +54,7 @@ Output:
 
 """
 
-HUSKYLENS_MCP_URL = "http://172.17.1.165:3000"
+HUSKYLENS_MCP_URL = "http://huskylens.local:3000"
 
 async def pull_image_from_mcp():
     print(f"Connecting to HuskyLens 2 MCP Server at {HUSKYLENS_MCP_URL}...")

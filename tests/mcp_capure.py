@@ -19,7 +19,7 @@ python3 mcp_capure.py self.get_recognition_result '{"algorithm":2}'
 """
 
 
-base = 'http://172.17.1.165:3000/sse'
+base = 'http://huskylens.local:3000/sse'
 events = queue.Queue()
 
 def read_events():
