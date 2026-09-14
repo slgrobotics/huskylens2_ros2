@@ -15,10 +15,22 @@ source install/setup.bash
 ros2 launch huskylens2_ros2 huskylens2.launch.py
 ```
 
-To run the node directly:
+To run the I2C node on Raspberry Pi directly:
 
 ```bash
-ros2 run huskylens2_ros2 huskylens2_node
+ros2 run huskylens2_ros2 huskylens2_i2c_node
+```
+
+To use another parameter file:
+
+```bash
+ros2 launch huskylens2_ros2 huskylens2.launch.py params_file:=/absolute/path/to/config.yaml
+```
+
+To run the MCP Server client node on Raspberry Pi or Workstation directly:
+
+```bash
+ros2 run huskylens2_ros2 huskylens2_mcp_node
 ```
 
 To use another parameter file:

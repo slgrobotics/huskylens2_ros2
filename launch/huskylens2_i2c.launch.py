@@ -36,8 +36,8 @@ def generate_launch_description():
 
     huskylens_node = Node(
         package='huskylens2_ros2',
-        executable='huskylens2_node',
-        name='huskylens2_node',
+        executable='huskylens2_i2c_node',
+        name='huskylens2_i2c_node',
         output='screen',
         parameters=[
             LaunchConfiguration('params_file'),

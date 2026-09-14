@@ -1,8 +1,18 @@
-huskylens2_node:
+
+huskylens2_i2c_node:
   ros__parameters:
     frame_id:     huskylens2_link
     i2c_bus:      1        # Raspberry Pi I2C bus (1 = /dev/i2c-1 on RPi4)
     i2c_address:  0x50     # Device responds at this address on this hardware
+    algorithm:    'object_recognition'  # Can be overridden in the launch file, see huskylens2_ros2/dfrobot_huskylens_i2c.py:70
+    poll_rate:    10.0     # Hz
+    image_width:  640      # Reference resolution used to normalize coordinates
+    image_height: 480
+
+huskylens2_mcp_node:
+  ros__parameters:
+    frame_id:     huskylens2_link
+    mcp_server:   "http://huskylens.local:3000"  # MCP server URL (do not include "/sse")
     algorithm:    'object_recognition'  # Can be overridden in the launch file, see huskylens2_ros2/dfrobot_huskylens_i2c.py:70
     poll_rate:    10.0     # Hz
     image_width:  640      # Reference resolution used to normalize coordinates

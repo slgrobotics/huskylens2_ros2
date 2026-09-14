@@ -22,7 +22,8 @@ setup(
     license='TODO',
     entry_points={
         'console_scripts': [
-            'huskylens2_node = huskylens2_ros2.huskylens2_node:main',
+            'huskylens2_i2c_node = huskylens2_ros2.huskylens2_i2c_node:main',
+            'huskylens2_mcp_node = huskylens2_ros2.huskylens2_mcp_node:main',
         ],
     },
 )
