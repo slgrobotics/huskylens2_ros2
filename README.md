@@ -95,9 +95,35 @@ ros2 launch huskylens2_ros2 huskylens2_mcp.launch.py \
   mcp_server:=http://huskylens.local:3000 algorithm_id:=2
 ```
 
-This is how the `/huskylens/image/marked` looks like:
+### Camera FOV Specifications (HUSKYLENS 2 Plus Kit)
+
+The *[HUSKYLENS 2 Plus Kit](https://www.amazon.com/dp/B0H1Q77BTR)* (SKU: KIT0222) includes two separate camera configurations to accommodate different computer vision and robotic tracking setups.
+
+#### 1. Standard Stock Camera Module
+The default baseline 2MP GC2093 image sensor comes pre-installed on the main HUSKYLENS 2 board.
+
+*   *Horizontal FOV (HFOV):* ~49.12°
+*   *Vertical FOV (VFOV):* ~38.69°
+
+#### 2. Included Wide-Angle Camera Module
+This modular accessory replaces the standard lens to expand the viewing area, making it ideal for mobile robotics, obstacle avoidance, and multi-target detection.
+
+*   *Diagonal FOV (DFOV):* 116.6°
+*   *Horizontal FOV (HFOV):* 107.6°
+*   *Vertical FOV (VFOV):* 72.6°
+*   *Effective Focal Length:* 2.02 mm
+
+Unlike WiFi module, cameras are easy to switch. Use `tests/mcp_stream.py` to adjust focus on the wide angle camera.
+
+This is how the `/huskylens/image/marked` topic looks like with *Standard Stock* camera, 640x480 resolution:
 
 <img alt="Huskylens marked image" src="https://github.com/user-attachments/assets/e5156614-6a2c-4331-b7a9-b180e60e3b3d" />
+
+This is how it looks with the *Wide-Angle* camera, included in *Huskylens 2 Plus kit*:
+
+<img alt="Huskylens wide FOV" src="https://github.com/user-attachments/assets/8cc25eaa-5b56-4669-8a06-d5e79aeeeff2" />
+
+**Note:** Huskylens Object Recognition model seems to have difficulty recognizing common objects even in ideal conditions.
 
 -------------------------
 
