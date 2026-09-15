@@ -33,6 +33,18 @@ JPEG_QUALITY = 90
 
 # Maximum time to wait for the complete HTTP response.
 REQUEST_TIMEOUT = 5.0
+MOUSE_LEAVE_EVENT = getattr(cv2, "EVENT_MOUSELEAVE", -1)
+
+
+def update_cursor(event, x, y, _flags, cursor):
+    """Remember the cursor position while it is over the display window."""
+
+    if event == cv2.EVENT_MOUSEMOVE:
+        cursor["x"] = x
+        cursor["y"] = y
+    elif event == MOUSE_LEAVE_EVENT:
+        cursor["x"] = None
+        cursor["y"] = None
 
 
 def colorize_depth(depth_mm):
@@ -127,6 +139,13 @@ def main():
         window_name,
         1280,
         720
+    )
+
+    cursor = {"x": None, "y": None}
+    cv2.setMouseCallback(
+        window_name,
+        update_cursor,
+        cursor
     )
 
     frame_count = 0
@@ -376,6 +395,86 @@ def main():
                 20,
                 1,
             )
+
+            # Show the depth under the cursor. Mouse coordinates refer to the
+            # resized window, so map them back to the depth image dimensions.
+            if cursor["x"] is not None and cursor["y"] is not None:
+                try:
+                    _window_x, _window_y, window_width, window_height = (
+                        cv2.getWindowImageRect(window_name)
+                    )
+                except cv2.error:
+                    window_width = depth_vis.shape[1]
+                    window_height = depth_vis.shape[0]
+
+                if window_width > 0 and window_height > 0:
+                    depth_x = round(
+                        cursor["x"] * depth_mm.shape[1] / window_width
+                    )
+                    depth_y = round(
+                        cursor["y"] * depth_mm.shape[0] / window_height
+                    )
+                    depth_x = np.clip(depth_x, 0, depth_mm.shape[1] - 1)
+                    depth_y = np.clip(depth_y, 0, depth_mm.shape[0] - 1)
+                    hovered_depth = int(depth_mm[depth_y, depth_x])
+
+                    cursor_x = round(
+                        depth_x * depth_vis.shape[1] / depth_mm.shape[1]
+                    )
+                    cursor_y = round(
+                        depth_y * depth_vis.shape[0] / depth_mm.shape[0]
+                    )
+                    cv2.drawMarker(
+                        depth_vis,
+                        (cursor_x, cursor_y),
+                        (255, 255, 255),
+                        cv2.MARKER_CROSS,
+                        18,
+                        2,
+                    )
+
+                    hover_text = (
+                        f"Depth: {hovered_depth / 1000.0:.2f} m"
+                        if hovered_depth > 0
+                        else "Depth: invalid"
+                    )
+                    text_size, text_baseline = cv2.getTextSize(
+                        hover_text,
+                        cv2.FONT_HERSHEY_SIMPLEX,
+                        0.7,
+                        2,
+                    )
+                    text_x = min(
+                        cursor_x + 14,
+                        depth_vis.shape[1] - text_size[0] - 10,
+                    )
+                    text_y = max(
+                        cursor_y - 14,
+                        text_size[1] + text_baseline + 10,
+                    )
+                    cv2.rectangle(
+                        depth_vis,
+                        (
+                            text_x - 5,
+                            text_y - text_size[1] - text_baseline - 5,
+                        ),
+                        (
+                            text_x + text_size[0] + 5,
+                            text_y + 5,
+                        ),
+                        (255, 255, 255),
+                        -1,
+                    )
+                    cv2.putText(
+                        depth_vis,
+                        hover_text,
+                        (text_x, text_y),
+                        cv2.FONT_HERSHEY_SIMPLEX,
+                        0.7,
+                        (0, 0, 0),
+                        2,
+                        cv2.LINE_AA,
+                    )
 
             cv2.imshow(
                 window_name,
