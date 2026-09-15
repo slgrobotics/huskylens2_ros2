@@ -35,6 +35,8 @@ Here is DFRobot's guide on [MCP Server use](https://wiki.dfrobot.com/sen0638/doc
 
 Check out this [guide](https://github.com/slgrobotics/articubot_one/wiki/ROS2-and-AI-Experiments#querying-mcp-server-for-its-capabilities-as-a-ros2-tool) for querying MCP Server using AI/LLM tools 
 
+> **Important:** camera images/frames are not retrievable via I2C interface. You have to use MCP Server over WiFi for this.
+
 ### Build and run
 
 Place this package in your ROS 2 workspace's `src` directory:
@@ -43,6 +45,8 @@ mkdir -p ~/husky_ws/src
 cd ~/husky_ws/src
 git clone https://github.com/slgrobotics/huskylens2_ros2.git
 ```
+
+> **Check out** *~/husky_ws/src/huskylens2_ros2/tests* directory
 
 From the workspace root, with your ROS 2 environment sourced:
 ```bash
