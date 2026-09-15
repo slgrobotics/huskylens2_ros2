@@ -1,3 +1,5 @@
+Back to [Main Project Home](https://github.com/slgrobotics/articubot_one/wiki)
+
 ## huskylens2_ros2
 
 Python (`ament_python`) ROS 2 package for HuskyLens 2.
@@ -53,3 +55,7 @@ ip neigh show
 <actual IP addr> dev eno1 lladdr 88:31:39:65:34:64 REACHABLE
 ```
 The `88:31:39:65:34:64` will be the MAC address you can use in your router's *"Reserve addresses"* (or similar) setup.
+
+-------------------------
+
+Back to [Main Project Home](https://github.com/slgrobotics/articubot_one/wiki)
