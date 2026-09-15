@@ -18,3 +18,11 @@ huskylens2_mcp_node:
     poll_rate:    10.0     # Hz (actual MCP response rate: about 1 Hz)
     image_width:  640      # Reference resolution used to normalize coordinates
     image_height: 480
+
+depth_node:
+  ros__parameters:
+    input_topic:  huskylens/image/compressed
+    output_topic: huskylens/image/depth
+    depth_server: "http://127.0.0.1:5001/depth"
+    request_timeout: 5.0
+    queue_size: 1

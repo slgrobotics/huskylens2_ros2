@@ -19,18 +19,18 @@ from sensor_msgs.msg import CompressedImage, Image
 This node subscribes to a compressed image topic, sends the images to an HTTP depth server,
  and publishes the resulting depth maps as 16-bit single-channel images.
 
-ros2 run huskylens2_ros2 huskylens2_depth_node
+ros2 run huskylens2_ros2 depth_node
 
   or
 
-ros2 run huskylens2_ros2 huskylens2_depth_node --ros-args -p depth_server:=http://127.0.0.1:5001/depth
+ros2 run huskylens2_ros2 depth_node --ros-args -p depth_server:=http://127.0.0.1:5001/depth
 
 """
 
 class DepthNode(Node):
 
     def __init__(self):
-        super().__init__('huskylens_depth_node')
+        super().__init__('depth_node')
         self.declare_parameter(
             'input_topic', 'huskylens/image/compressed')
         self.declare_parameter(

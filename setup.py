@@ -24,7 +24,7 @@ setup(
         'console_scripts': [
             'huskylens2_i2c_node = huskylens2_ros2.huskylens2_i2c_node:main',
             'huskylens2_mcp_node = huskylens2_ros2.huskylens2_mcp_node:main',
-            'huskylens2_depth_node = huskylens2_ros2.depth_node:main',
+            'depth_node = huskylens2_ros2.depth_node:main',
         ],
     },
 )
