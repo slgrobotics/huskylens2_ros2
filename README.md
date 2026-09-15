@@ -19,11 +19,9 @@ To run the **I2C node on Raspberry Pi** directly:
 
 ```bash
 ros2 run huskylens2_ros2 huskylens2_i2c_node
-```
 
-To use another parameter file:
+  or, using another parameter file:
 
-```bash
 ros2 launch huskylens2_ros2 huskylens2.launch.py params_file:=/absolute/path/to/config.yaml
 ```
 
@@ -38,18 +36,16 @@ ros2 launch huskylens2_ros2 huskylens2_mcp.launch.py \
   mcp_server:=http://huskylens.local:3000 algorithm_id:=2
 ```
 
+This is how the `/huskylens/image/marked` looks like:
 
-To use another parameter file:
+<img width="754" height="567" alt="Screenshot from 2026-09-14 19-08-35" src="https://github.com/user-attachments/assets/3aaea548-d9b8-45a6-8648-a91e97e636dc" />
 
-```bash
-ros2 launch huskylens2_ros2 huskylens2.launch.py params_file:=/absolute/path/to/config.yaml
-```
+> **Note:**
+> - You must use the actual IP address instead of *"huskylens.local"*, unless you add it to your `/etc/hosts` file.
+> - There is no way to set a *static IP address* using the HuskyLens 2 on-screen menus.
+> - You can find the DHCP-assigned IP address in the *"MCP Server"* section of on-screen menu.
 
-**Note:**
-- You must use the actual IP address instead of *"huskylens.local"*, unless you add it to your `/etc/hosts` file.
-- There is no way to set a *static IP address* using the HuskyLens 2 on-screen menus.
-- You can find the DHCP-assigned IP address in the *"MCP Server"* section of on-screen menu.
-- Most routers allow you to assign a reserved IP address to a device based on its MAC address.
+Most routers allow you to assign a reserved IP address to a device based on its MAC address.
 To find the MAC address for your HuskyLens 2:
 ```
 ping -c <actual IP addr>
