@@ -326,10 +326,16 @@ def main():
                 else 0.0
             )
 
+            sent_dimensions = f"{frame.shape[1]}x{frame.shape[0]}"
+            sent_bytes = jpeg.nbytes
+
             cv2.putText(
                 depth_vis,
                 f"HTTP: {round_trip_ms:.1f} ms  "
-                f"({client_fps:.1f} FPS)",
+                f"({client_fps:.1f} FPS)  "
+                f"TX: {sent_dimensions}, {sent_bytes / 1024.0:.1f} KB  "
+                f"RX: {depth_mm.shape[1]}x{depth_mm.shape[0]}, "
+                f"{len(response.content) / 1024.0:.1f} KB",
                 (20, 35),
                 cv2.FONT_HERSHEY_SIMPLEX,
                 0.7,
@@ -376,6 +382,17 @@ def main():
                 depth_vis,
                 f"Center: {center_depth:.2f} m",
                 (20, 155),
+                cv2.FONT_HERSHEY_SIMPLEX,
+                0.6,
+                (255, 255, 255),
+                2,
+                cv2.LINE_AA,
+            )
+
+            cv2.putText(
+                depth_vis,
+                "Press q or ESC to exit",
+                (20, 185),
                 cv2.FONT_HERSHEY_SIMPLEX,
                 0.6,
                 (255, 255, 255),
