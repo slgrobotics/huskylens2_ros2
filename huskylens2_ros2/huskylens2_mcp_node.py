@@ -149,6 +149,8 @@ class HuskyLens2McpNode(Node):
         self._marked_image_pub = self.create_publisher(
             Image, 'huskylens/image/marked', 10)
         self._bridge = CvBridge()
+        self._last_marked_time = None
+        self._marked_fps = 0.0
 
         self._responses = queue.Queue(maxsize=2)
         self._stop_event = threading.Event()
@@ -289,6 +291,7 @@ class HuskyLens2McpNode(Node):
                 center_y = round(float(detection.get('yCenter', 0)) * scale_y)
                 arm = max(12, round(min(frame_width, frame_height) * 0.035))
                 point = (center_x, center_y)
+                name = str(detection.get('name', '')).strip()
 
                 # Draw a white outline first so the red cross remains visible
                 # over both dark and bright parts of the camera image.
@@ -298,6 +301,50 @@ class HuskyLens2McpNode(Node):
                 cv2.drawMarker(
                     frame, point, (0, 0, 255), cv2.MARKER_CROSS,
                     markerSize=arm * 2, thickness=max(2, arm // 3))
+
+                if name:
+                    label_origin = (center_x + arm + 6, center_y - arm - 6)
+                    label_size, label_baseline = cv2.getTextSize(
+                        name, cv2.FONT_HERSHEY_SIMPLEX, 0.7, 2)
+                    label_x, label_y = label_origin
+                    label_x = min(label_x, frame_width - label_size[0] - 8)
+                    label_y = max(label_y, label_size[1] + label_baseline + 8)
+                    cv2.rectangle(
+                        frame,
+                        (label_x - 4, label_y - label_size[1] - label_baseline - 4),
+                        (label_x + label_size[0] + 4, label_y + 4),
+                        (255, 255, 255), -1)
+                    cv2.putText(
+                        frame, name, (label_x, label_y),
+                        cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 0), 2,
+                        cv2.LINE_AA)
+
+            now = time.monotonic()
+            if self._last_marked_time is not None:
+                interval = now - self._last_marked_time
+                if interval > 0:
+                    measured_fps = 1.0 / interval
+                    if self._marked_fps == 0.0:
+                        self._marked_fps = measured_fps
+                    else:
+                        self._marked_fps = (
+                            0.8 * self._marked_fps + 0.2 * measured_fps)
+            self._last_marked_time = now
+
+            fps_text = f'FPS: {self._marked_fps:.1f}'
+            fps_size, fps_baseline = cv2.getTextSize(
+                fps_text, cv2.FONT_HERSHEY_SIMPLEX, 0.8, 2)
+            fps_x = frame_width - fps_size[0] - 14
+            fps_y = fps_size[1] + fps_baseline + 10
+            cv2.rectangle(
+                frame,
+                (fps_x - 6, fps_y - fps_size[1] - fps_baseline - 6),
+                (frame_width - 6, fps_y + 6),
+                (255, 255, 255), -1)
+            cv2.putText(
+                frame, fps_text, (fps_x, fps_y),
+                cv2.FONT_HERSHEY_SIMPLEX, 0.8, (0, 0, 0), 2,
+                cv2.LINE_AA)
 
             marked = self._bridge.cv2_to_imgmsg(frame, encoding='bgr8')
             marked.header = compressed.header
