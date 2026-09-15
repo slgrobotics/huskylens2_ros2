@@ -170,6 +170,7 @@ performs inference, and returns the depth map as a 16-bit PNG image.
 
 The following tests interact with the server:
 - `tests/test_depth_server.py`
+- `tests/test_depth_server_gui.py`
 - `tests/test_depth_webcam.py`
 
 A stand-alone `tests/test_depth.py` can directly call Depth Anything V2 model (while running under a [virtual environment](https://github.com/slgrobotics/articubot_one/wiki/Depth-Anything-V2)).
