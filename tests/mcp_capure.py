@@ -8,6 +8,10 @@ from urllib.parse import urljoin
 import requests
 
 """
+This is a simple caller for the HuskyLens 2 MCP Server.
+It uses very standard Python libraries (requests, json, base64) to avoid installing additional dependencies.
+It connects to the server, initializes the session, and sends a request to retrieve the recognition result (including the image).
+
 How to run:
 
 # Check the active algorithm ID
