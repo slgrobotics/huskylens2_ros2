@@ -10,10 +10,12 @@ from urllib.parse import urljoin
 
 import requests
 import rclpy
+import cv2
+from cv_bridge import CvBridge
 from geometry_msgs.msg import Point
 from rclpy.executors import ExternalShutdownException
 from rclpy.node import Node
-from sensor_msgs.msg import CompressedImage
+from sensor_msgs.msg import CompressedImage, Image
 from std_msgs.msg import String
 from vision_msgs.msg import Detection2D, Detection2DArray, ObjectHypothesisWithPose
 
@@ -31,13 +33,23 @@ class McpClient:
         self._endpoint = None
 
     def connect(self):
-        self._sse_response = self._session.get(
+        if self._sse_response is not None:
+            self._sse_response.close()
+        self._session.close()
+        self._session = requests.Session()
+        self.events = queue.Queue()
+        self._endpoint = None
+
+        response = self._session.get(
             f'{self.server_url}/sse', stream=True,
             timeout=(self.timeout, None))
-        self._sse_response.raise_for_status()
-        threading.Thread(target=self._read_events, daemon=True).start()
+        response.raise_for_status()
+        self._sse_response = response
+        events = self.events
+        threading.Thread(
+            target=self._read_events, args=(response, events), daemon=True).start()
 
-        kind, value = self.events.get(timeout=self.timeout)
+        kind, value = events.get(timeout=self.timeout)
         if kind != 'endpoint':
             raise RuntimeError(f'Expected MCP endpoint, received {kind}: {value}')
         self._endpoint = urljoin(f'{self.server_url}/sse', value)
@@ -48,22 +60,22 @@ class McpClient:
         })
         self.notify('notifications/initialized', {})
 
-    def _read_events(self):
+    def _read_events(self, response, events):
         kind = ''
         data = []
         try:
-            for line in self._sse_response.iter_lines(
+            for line in response.iter_lines(
                     chunk_size=1, decode_unicode=True):
                 if not line:
                     if data:
-                        self.events.put((kind, '\n'.join(data)))
+                        events.put((kind, '\n'.join(data)))
                         kind, data = '', []
                 elif line.startswith('event:'):
                     kind = line[6:].strip()
                 elif line.startswith('data:'):
                     data.append(line[5:].strip())
         except Exception as exc:
-            self.events.put(('error', str(exc)))
+            events.put(('error', str(exc)))
 
     def _post(self, method, params, request_id=None):
         payload = {'jsonrpc': '2.0', 'method': method, 'params': params}
@@ -100,6 +112,8 @@ class McpClient:
         if self._sse_response is not None:
             self._sse_response.close()
         self._session.close()
+        self._sse_response = None
+        self._endpoint = None
 
 
 class HuskyLens2McpNode(Node):
@@ -132,6 +146,9 @@ class HuskyLens2McpNode(Node):
             String, 'huskylens/algorithm', 10)
         self._image_pub = self.create_publisher(
             CompressedImage, 'huskylens/image/compressed', 10)
+        self._marked_image_pub = self.create_publisher(
+            Image, 'huskylens/image/marked', 10)
+        self._bridge = CvBridge()
 
         self._responses = queue.Queue(maxsize=2)
         self._stop_event = threading.Event()
@@ -162,6 +179,14 @@ class HuskyLens2McpNode(Node):
             except Exception as exc:
                 self.get_logger().warn(
                     f'MCP request failed: {exc}', throttle_duration_sec=5.0)
+                try:
+                    self.get_logger().info('Reconnecting to HuskyLens MCP server')
+                    self._client.connect()
+                except Exception as reconnect_exc:
+                    self.get_logger().warn(
+                        f'MCP reconnect failed: {reconnect_exc}',
+                        throttle_duration_sec=5.0)
+                    self._stop_event.wait(2.0)
             self._stop_event.wait(max(0.0, period - (time.monotonic() - started)))
 
     @staticmethod
@@ -223,6 +248,7 @@ class HuskyLens2McpNode(Node):
         algorithm.data = self._algorithm
         self._algo_pub.publish(algorithm)
         self._publish_image(latest, stamp)
+        self._publish_marked_image(latest, stamp, detections)
 
     def _publish_image(self, result, stamp):
         for item in result.get('content', []):
@@ -234,6 +260,48 @@ class HuskyLens2McpNode(Node):
             image.format = item.get('mimeType', 'image/jpeg').split('/')[-1]
             image.data = base64.b64decode(item['data'])
             self._image_pub.publish(image)
+            break
+
+    def _publish_marked_image(self, result, stamp, detections):
+        for item in result.get('content', []):
+            if item.get('type') != 'image' or not item.get('data'):
+                continue
+            compressed = CompressedImage()
+            compressed.header.stamp = stamp
+            compressed.header.frame_id = self._frame_id
+            compressed.format = item.get('mimeType', 'image/jpeg').split('/')[-1]
+            compressed.data = base64.b64decode(item['data'])
+
+            try:
+                frame = self._bridge.compressed_imgmsg_to_cv2(
+                    compressed, desired_encoding='bgr8')
+            except Exception as exc:
+                self.get_logger().warn(
+                    f'Could not decode image for marked topic: {exc}',
+                    throttle_duration_sec=10.0)
+                return
+
+            frame_height, frame_width = frame.shape[:2]
+            scale_x = frame_width / float(self._img_w)
+            scale_y = frame_height / float(self._img_h)
+            for detection in detections:
+                center_x = round(float(detection.get('xCenter', 0)) * scale_x)
+                center_y = round(float(detection.get('yCenter', 0)) * scale_y)
+                arm = max(12, round(min(frame_width, frame_height) * 0.035))
+                point = (center_x, center_y)
+
+                # Draw a white outline first so the red cross remains visible
+                # over both dark and bright parts of the camera image.
+                cv2.drawMarker(
+                    frame, point, (255, 255, 255), cv2.MARKER_CROSS,
+                    markerSize=arm * 2, thickness=arm // 3 + 3)
+                cv2.drawMarker(
+                    frame, point, (0, 0, 255), cv2.MARKER_CROSS,
+                    markerSize=arm * 2, thickness=max(2, arm // 3))
+
+            marked = self._bridge.cv2_to_imgmsg(frame, encoding='bgr8')
+            marked.header = compressed.header
+            self._marked_image_pub.publish(marked)
             break
 
     def destroy_node(self):
