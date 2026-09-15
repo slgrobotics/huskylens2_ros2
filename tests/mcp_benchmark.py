@@ -12,7 +12,7 @@ from urllib.parse import urljoin
 import requests
 
 """
-This is a modified version of mcp_capure.py that benchmarks the latency of MCP calls to self.get_recognition_result.
+This is a modified version of mcp_capture.py that benchmarks the latency of MCP calls to self.get_recognition_result.
 
 How to run (you need to select an algorithm from the HuskyLens 2 menu first):
 
