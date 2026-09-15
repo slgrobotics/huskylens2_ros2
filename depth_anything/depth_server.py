@@ -29,11 +29,11 @@ The server loads the model once at startup, processes each input image,
 performs inference, and returns the depth map as a 16-bit PNG image.
 
     
-    ROS 2 node / other client
-            │
-            │ HTTP POST
-            │ image/jpeg or image/png
-            ▼
+     ROS 2 node / other client
+                 │
+                 │ HTTP POST
+                 │ image/jpeg or image/png
+                 ▼
     ┌──────────────────────────┐
     │ Depth Anything V2 server │
     │                          │
