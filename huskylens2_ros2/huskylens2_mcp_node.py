@@ -88,6 +88,20 @@ class McpClient:
     def notify(self, method, params):
         self._post(method, params)
 
+    def select_application(self, requested_name):
+        application_names = {
+            'object_recognition': 'Object Recognition',
+            'object': 'Object Recognition',
+        }
+        selected = application_names.get(
+            str(requested_name).strip().lower(), requested_name)
+        self.request(
+            'tools/call', {
+                'name': 'self.manage_applications.switch_application',
+                'arguments': {'algorithm': selected},
+            })
+        return selected
+
     def request(self, method, params):
         request_id = self._next_id
         self._next_id += 1
@@ -157,6 +171,8 @@ class HuskyLens2McpNode(Node):
         self._client = McpClient(server, timeout)
         self.get_logger().info(f'Connecting to HuskyLens MCP server at {server}')
         self._client.connect()
+        selected = self._client.select_application(self._algorithm)
+        self.get_logger().info(f'Active HuskyLens application: {selected}')
         self.get_logger().info('HuskyLens MCP session established')
 
         self._worker = threading.Thread(target=self._request_loop, daemon=True)
@@ -184,6 +200,9 @@ class HuskyLens2McpNode(Node):
                 try:
                     self.get_logger().info('Reconnecting to HuskyLens MCP server')
                     self._client.connect()
+                    selected = self._client.select_application(self._algorithm)
+                    self.get_logger().info(
+                        f'Active HuskyLens application: {selected}')
                 except Exception as reconnect_exc:
                     self.get_logger().warn(
                         f'MCP reconnect failed: {reconnect_exc}',
