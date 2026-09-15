@@ -221,7 +221,7 @@ This is how an image from HuskyLens 2 is transferred:
 
 <img width="757" height="567" alt="Screenshot from 2026-09-15 17-08-00" src="https://github.com/user-attachments/assets/866af907-b61e-4dff-a46e-b22270b31044" />
 
-`huskylens/image/depth` as returned by *Depth Anything V2 server*:
+Depth image returned by *Depth Anything V2 server* and published by *depth_node* as `huskylens/image/depth`:
 
 <img width="757" height="567" alt="Screenshot from 2026-09-15 17-07-47" src="https://github.com/user-attachments/assets/bb1fea82-c46f-45af-97d7-a5b0faf03fe5" />
 
