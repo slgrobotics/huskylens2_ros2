@@ -175,6 +175,56 @@ The following tests interact with the server:
 
 A stand-alone `tests/test_depth.py` can directly call Depth Anything V2 model (while running under a [virtual environment](https://github.com/slgrobotics/articubot_one/wiki/Depth-Anything-V2)).
 
+### Depth node
+
+A universal *depth_node* is included in the package. It subscribes to an image topic and queries the *Depth Anything V2 server*, publishing its response as depth maps/images.
+
+This node works with the *HuskyLens 2 MCP node* (`launch/huskylens2_mcp.launch.py`), or any other node publishing compressed images.
+
+Make sure that the Depth Anything V2 server is running, e.g.:
+```
+  cd ~/husky_ws/src/huskylens2_ros2/depth_anything
+  ... activate your Python 3 virtual environment ...
+  ./depth_server.py
+```
+
+Run it (on the same machine as *Depth Anything V2 server* to minimize image traffic):
+```
+ros2 run huskylens2_ros2 depth_node
+
+  or
+
+ros2 run huskylens2_ros2 depth_node --ros-args -p depth_server:=http://127.0.0.1:5001/depth
+```
+
+```    
+     ROS 2 HuskyLens 2 MCP node
+                    │
+                    │ huskylens/image/compressed topic
+                    ▼
+     ROS 2 depth_node -----┐
+                           │ HTTP POST
+                           ▼
+                        ┌──────────────────────────┐
+                        │ Depth Anything V2 server │
+                        └──┬───────────────────────┘
+                           ▼ HTTP response -  16-bit depth map
+     ROS 2 depth_node -----┘
+                 │  `huskylens/image/depth` topic
+                 ▼
+        Any ROS2 subscribers
+```
+
+This is how an image from HuskyLens 2 is transferred:
+
+`huskylens/image/compressed` as came from *HuskyLens 2 MCP Server*:
+
+<img width="757" height="567" alt="Screenshot from 2026-09-15 17-08-00" src="https://github.com/user-attachments/assets/866af907-b61e-4dff-a46e-b22270b31044" />
+
+`huskylens/image/depth` as returned by *Depth Anything V2 server*:
+
+<img width="757" height="567" alt="Screenshot from 2026-09-15 17-07-47" src="https://github.com/user-attachments/assets/bb1fea82-c46f-45af-97d7-a5b0faf03fe5" />
+
 -------------------------
 
 Back to [Main Project Home](https://github.com/slgrobotics/articubot_one/wiki)
