@@ -123,7 +123,7 @@ class HuskyLens2McpNode(Node):
         self.declare_parameter('mcp_server', 'http://huskylens.local:3000')
         self.declare_parameter('algorithm', 'object_recognition')
         self.declare_parameter('algorithm_id', 2)
-        self.declare_parameter('poll_rate', 10.0)
+        self.declare_parameter('poll_rate', 10.0)  # actual MCP response rate: about 1 Hz
         self.declare_parameter('frame_id', 'huskylens2_link')
         self.declare_parameter('image_width', 640)
         self.declare_parameter('image_height', 480)

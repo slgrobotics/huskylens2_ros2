@@ -3,8 +3,8 @@ Back to [Main Project Home](https://github.com/slgrobotics/articubot_one/wiki)
 ## huskylens2_ros2
 
 Python (`ament_python`) ROS 2 package for HuskyLens 2.
-The node starts and spins; hardware communication and publishers are TODOs.
-Set the maintainer and license in `package.xml` and `setup.py` before distribution.
+
+Original I2C node (and credits for it to): https://github.com/irayfuego/robotica/blob/main/src/huskylens2_ros2/huskylens2_ros2/huskylens_node.py
 
 ### Build and run
 
