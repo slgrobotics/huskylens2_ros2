@@ -31,11 +31,25 @@ Connect it to Raspberry Pi header pins:
   - SDA marked as "D/T" to pin 03 (GPIO02, SDA1)
   - Run `i2cdetect -y 1` - the device shows on address 0x50
 
+> **Important:** camera images/frames are not retrievable via I2C interface. You have to use MCP Server over WiFi for this.
+
 Here is DFRobot's guide on [MCP Server use](https://wiki.dfrobot.com/sen0638/docs/22605).
 
 Check out this [guide](https://github.com/slgrobotics/articubot_one/wiki/ROS2-and-AI-Experiments#querying-mcp-server-for-its-capabilities-as-a-ros2-tool) for querying MCP Server using AI/LLM tools 
 
-> **Important:** camera images/frames are not retrievable via I2C interface. You have to use MCP Server over WiFi for this.
+> **Note:**
+> - You must use the actual IP address instead of *"huskylens.local"*, unless you add it to your `/etc/hosts` file.
+> - There is no way to set a *static IP address* using the HuskyLens 2 on-screen menus.
+> - You can find the DHCP-assigned IP address in the *"MCP Server"* section of on-screen menu.
+
+Most routers allow you to assign a reserved IP address to a device based on its MAC address.
+To find the MAC address for your HuskyLens 2:
+```
+ping -c <actual IP addr>
+ip neigh show
+<actual IP addr> dev eno1 lladdr 88:31:39:65:34:64 REACHABLE
+```
+The `88:31:39:65:34:64` will be the MAC address you can use in your router's *"Reserve addresses"* (or similar) setup.
 
 ### Build and run
 
@@ -60,7 +74,7 @@ source install/setup.bash
 ros2 launch huskylens2_ros2 huskylens2.launch.py
 ```
 
-To run the **_I2C node_** on Raspberry Pi directly:
+To run the **_I2C node_** on Raspberry Pi:
 
 ```bash
 ros2 run huskylens2_ros2 huskylens2_i2c_node
@@ -70,7 +84,7 @@ ros2 run huskylens2_ros2 huskylens2_i2c_node
 ros2 launch huskylens2_ros2 huskylens2.launch.py params_file:=/absolute/path/to/config.yaml
 ```
 
-To run the **_MCP Server client node_** on Raspberry Pi or Workstation directly:
+To run the **_MCP Server client node_** on Raspberry Pi or Workstation:
 
 ```bash
 ros2 run huskylens2_ros2 huskylens2_mcp_node
@@ -84,20 +98,6 @@ ros2 launch huskylens2_ros2 huskylens2_mcp.launch.py \
 This is how the `/huskylens/image/marked` looks like:
 
 <img alt="Huskylens marked image" src="https://github.com/user-attachments/assets/e5156614-6a2c-4331-b7a9-b180e60e3b3d" />
-
-> **Note:**
-> - You must use the actual IP address instead of *"huskylens.local"*, unless you add it to your `/etc/hosts` file.
-> - There is no way to set a *static IP address* using the HuskyLens 2 on-screen menus.
-> - You can find the DHCP-assigned IP address in the *"MCP Server"* section of on-screen menu.
-
-Most routers allow you to assign a reserved IP address to a device based on its MAC address.
-To find the MAC address for your HuskyLens 2:
-```
-ping -c <actual IP addr>
-ip neigh show
-<actual IP addr> dev eno1 lladdr 88:31:39:65:34:64 REACHABLE
-```
-The `88:31:39:65:34:64` will be the MAC address you can use in your router's *"Reserve addresses"* (or similar) setup.
 
 -------------------------
 
