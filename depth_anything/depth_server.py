@@ -31,7 +31,10 @@ performs inference, and returns the depth map as a 16-bit PNG image.
 See:
 https://github.com/slgrobotics/articubot_one/wiki/Depth-Anything-V2
 
+Install additional dependencies:
+    pip install fastapi uvicorn
 
+    
     ROS 2 node / other client
             │
             │ HTTP POST
