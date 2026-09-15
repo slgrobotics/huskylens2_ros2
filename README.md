@@ -125,6 +125,55 @@ This is how it looks with the *Wide-Angle* camera, included in *Huskylens 2 Plus
 
 **Note:** Huskylens Object Recognition model seems to have difficulty recognizing common objects even in ideal conditions.
 
+### Depth Anything V2 HTTP Server
+
+See this [guide](https://github.com/slgrobotics/articubot_one/wiki/Depth-Anything-V2) for information.
+
+The *Depth Anything V2 HTTP Server* in the `depth_anything` directory takes an image and returns a depth map (as a .png image).
+
+It must be run in an environment with a GPU (CUDA) - normally a Python
+"sandboxed" *virtual environment* with PyTorch installed.
+
+Make sure you install additional dependencies (in the `venv`):
+```
+pip install fastapi uvicorn
+```
+
+A ROS2 node or any other program can issue an HTTP POST request to this server
+with an image.
+
+The server loads the model once at startup, processes each input image,
+performs inference, and returns the depth map as a 16-bit PNG image.
+
+```    
+     ROS 2 node / other client
+                 │
+                 │ HTTP POST
+                 │ image/jpeg or image/png
+                 ▼
+    ┌──────────────────────────┐
+    │ Depth Anything V2 server │
+    │                          │
+    │ decode image             │
+    │ preprocess               │
+    │ CUDA inference           │
+    │ resize to input size     │
+    │ meters → uint16 mm       │
+    │ encode PNG               │
+    └────────────┬─────────────┘
+                 │
+                 │ HTTP response
+                 │ image/png
+                 ▼
+          16-bit depth map
+```
+
+The following tests interact with the server:
+- `tests/test_depth_server.py`
+- `tests/test_depth_webcam.py`
+
+A stand-alone `tests/test_depth.py` can directly call Depth Anything V2 model (while running under a [virtual environment](https://github.com/slgrobotics/articubot_one/wiki/Depth-Anything-V2)).
+
 -------------------------
 
 Back to [Main Project Home](https://github.com/slgrobotics/articubot_one/wiki)
