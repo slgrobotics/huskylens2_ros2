@@ -28,12 +28,6 @@ with an image.
 The server loads the model once at startup, processes each input image,
 performs inference, and returns the depth map as a 16-bit PNG image.
 
-See:
-https://github.com/slgrobotics/articubot_one/wiki/Depth-Anything-V2
-
-Install additional dependencies:
-    pip install fastapi uvicorn
-
     
     ROS 2 node / other client
             │
@@ -59,9 +53,46 @@ Install additional dependencies:
 
 Run:
 
-    python3 depth_server.py
+    See:
+    https://github.com/slgrobotics/articubot_one/wiki/Depth-Anything-V2
+
+    Install additional dependencies (in the venv):
+        pip install fastapi uvicorn
+
+    (venv) sergei@sergeiu7:~/husky_ws/src/huskylens2_ros2/depth_anything$ ./depth_server.py
+       -- a short wait here ---
+    MODEL_NAME: depth-anything/Depth-Anything-V2-Metric-Indoor-Base-hf
+    Device: cuda
+    GPU: NVIDIA GeForce RTX 3060 Ti
+    Loading model...
+    ==================================================
+    Processor size    : SizeDict(height=518, width=518, longest_edge=None, shortest_edge=None,
+                                 max_height=None, max_width=None, min_pixels=None, max_pixels=None)
+    keep_aspect_ratio : True
+    ensure_multiple_of: 14
+    ==================================================
+    Loading weights: 100%|██████████████| 287/287 [00:00<00:00, 1293.94it/s]
+    Model loaded.
+    Warming up GPU...
+    GPU warm-up complete.
+
+    Starting Depth Anything V2 server at http://127.0.0.1:5001
+
+    INFO:     Started server process [1760635]
+    INFO:     Waiting for application startup.
+    INFO:     Application startup complete.
+    INFO:     Uvicorn running on http://127.0.0.1:5001 (Press CTRL+C to quit)
+    INFO:     127.0.0.1:34628 - "GET / HTTP/1.1" 200 OK   <- I opened http://127.0.0.1:5001/ in the browser
+    INFO:     127.0.0.1:34628 - "GET /favicon.ico HTTP/1.1" 404 Not Found
+    2129x1602  inference=88.1 ms  total=538.3 ms  depth=1.45-17.55 m  png=2672.8 KiB  <- I ran the test below with large test.png image
+    INFO:     127.0.0.1:51672 - "POST /depth HTTP/1.1" 200 OK
+
 
 Test:
+
+    run "../tests/test_depth_server.py"
+
+  or:  
 
     curl \
         -X POST \
@@ -70,11 +101,11 @@ Test:
         http://127.0.0.1:5001/depth \
         --output depth_16.png
 
-The returned PNG contains uint16 depth values in millimeters.
+    The returned PNG contains uint16 depth values in millimeters.
 
-    1743 -> 1.743 meters
+        1743 -> 1.743 meters
 
-A value of 0 is reserved for invalid depth.
+    A value of 0 is reserved for invalid depth.
 """
 
 
