@@ -10,10 +10,11 @@ import numpy as np
 import requests
 
 """
-This is a simple caller for the HuskyLens 2 MCP Server.
+This is a simple image streamer for the HuskyLens 2 MCP Server.
 It uses very standard Python libraries (requests, json, base64) to avoid installing additional dependencies.
-It connects to the server, initializes the session, and sends requests to retrieve the recognition result (including the image).
-It displays the image in a window, marking centers of recognized objects with a red cross, with the "name" label.
+It connects to the server, initializes the session, selects Object Recognition algorithm,
+  and sends requests to retrieve the recognition result (including the image).
+It displays the image in a window, marking centers of recognized objects with a red cross, with the "name" (a.k.a. class_id) label.
 
 How to run:
 
@@ -24,7 +25,7 @@ python3 mcp_stream.py
 
 BASE_URL = 'http://huskylens.local:3000'
 SSE_URL = f'{BASE_URL}/sse'
-ALGORITHM_ID = 2
+ALGORITHM_ID = 2  # Object Recognition will be set automatically.
 
 def read_events(events):
     try:

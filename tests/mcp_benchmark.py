@@ -12,7 +12,7 @@ import requests
 """
 This is a modified version of mcp_capure.py that benchmarks the latency of MCP calls to self.get_recognition_result.
 
-How to run:
+How to run (you need to select an algorithm from the HuskyLens 2 menu first):
 
 # Benchmark MCP calls to self.get_recognition_result
 python3 mcp_benchmark.py  --benchmark 2 10

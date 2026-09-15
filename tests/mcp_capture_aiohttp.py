@@ -8,7 +8,7 @@ Retrieve the image from HuskyLens 2 MCP Server using aiohttp and SSE.
 
 This script connects to the MCP server, initializes the session, and requests the recognition result.
 
-Usage:
+Usage (you may need to select an algorithm from the HuskyLens 2 menu first):
     python3 mcp_capture_aiohttp.py
 
 Output:

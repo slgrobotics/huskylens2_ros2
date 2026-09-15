@@ -14,7 +14,7 @@ It connects to the server, initializes the session, and sends a request to retri
 
 How to run:
 
-# Check the active algorithm ID
+# Check the active algorithm ID (you need to select one from the HuskyLens 2 menu first)
 python3 mcp_capure.py self.manage_applications.current_application '{}'
 
 # Retrieve the image to "/tmp/huskylens-capture..." (replace 2 if the first command reports another ID)
