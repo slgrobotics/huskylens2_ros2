@@ -25,6 +25,7 @@ def generate_launch_description():
         # 1=Face Recognition, 2=Object Recognition, 3=Line Tracking, 4=Color Recognition,
         # 5=Tag Recognition, 6=Gesture Recognition, 7=Pose Recognition, 8=Hand Tracking,
         # 9=OCR, 10=QR Code, 11=Barcode
+    )
 
     mcp_server_arg = DeclareLaunchArgument(
         'mcp_server', default_value='http://huskylens.local:3000',
@@ -33,6 +34,10 @@ def generate_launch_description():
     poll_rate_arg = DeclareLaunchArgument(
         'poll_rate', default_value='10.0',
         description='MCP request frequency in Hz')
+
+    camera_module_arg = DeclareLaunchArgument(
+        'camera_module', default_value='wide_angle',
+        description='Camera module installed: stock or wide_angle')
 
     config_arg = DeclareLaunchArgument(
         'params_file',
@@ -50,15 +55,16 @@ def generate_launch_description():
                 'algorithm_id': LaunchConfiguration('algorithm_id'),
                 'mcp_server': LaunchConfiguration('mcp_server'),
                 'poll_rate':  LaunchConfiguration('poll_rate'),
+                'camera_module': LaunchConfiguration('camera_module'),
             },
         ],
     )
 
     return LaunchDescription([
-        algorithm_arg,
         algorithm_id_arg,
         mcp_server_arg,
         poll_rate_arg,
+        camera_module_arg,
         config_arg,
         huskylens_node,
     ])

@@ -3,6 +3,7 @@
 
 import base64
 import json
+import math
 import queue
 import threading
 import time
@@ -15,7 +16,7 @@ from cv_bridge import CvBridge
 from geometry_msgs.msg import Point
 from rclpy.executors import ExternalShutdownException
 from rclpy.node import Node
-from sensor_msgs.msg import CompressedImage, Image
+from sensor_msgs.msg import CameraInfo, CompressedImage, Image
 from std_msgs.msg import String
 from vision_msgs.msg import Detection2D, Detection2DArray, ObjectHypothesisWithPose
 
@@ -32,6 +33,11 @@ algorithm_id_to_name = {
             10: 'QR Code',
             11: 'Barcode',
         }
+
+camera_module_fov = {
+    'stock': (49.12, 38.69),
+    'wide_angle': (107.6, 72.6),
+}
 
 class McpClient:
     """Small requests-based MCP client using the server's SSE transport."""
@@ -157,6 +163,7 @@ class HuskyLens2McpNode(Node):
 
     def __init__(self):
         super().__init__('huskylens_mcp_node')
+        self.declare_parameter('camera_module', 'stock')  # stock or wide_angle
         self.declare_parameter('mcp_server', 'http://huskylens.local:3000')
         self.declare_parameter('algorithm_id', 2)
         self.declare_parameter('poll_rate', 10.0)  # actual MCP response rate: about 1 Hz
@@ -165,6 +172,8 @@ class HuskyLens2McpNode(Node):
         self.declare_parameter('image_height', 480)
         self.declare_parameter('mcp_timeout', 5.0)
 
+        self._camera_module = str(
+            self.get_parameter('camera_module').value).strip().lower()
         server = self.get_parameter('mcp_server').value
         self._algorithm_id = int(self.get_parameter('algorithm_id').value)
         self._poll_rate = float(self.get_parameter('poll_rate').value)
@@ -173,6 +182,15 @@ class HuskyLens2McpNode(Node):
         self._img_h = int(self.get_parameter('image_height').value)
         timeout = float(self.get_parameter('mcp_timeout').value)
         self._status_timeout = max(timeout, 0.1)
+
+        if self._camera_module not in camera_module_fov:
+            valid_modules = ', '.join(camera_module_fov)
+            raise ValueError(
+                f'Unknown camera_module {self._camera_module!r}; '
+                f'expected one of: {valid_modules}')
+
+        self.get_logger().info(f'Camera module configured: {self._camera_module}'
+                               f' (FOV: {camera_module_fov[self._camera_module][0]}°W x {camera_module_fov[self._camera_module][1]}°H)')
 
         self._det_pub = self.create_publisher(
             Detection2DArray, 'huskylens/detections', 10)
@@ -186,6 +204,8 @@ class HuskyLens2McpNode(Node):
             CompressedImage, 'huskylens/image/compressed', 10)
         self._marked_image_pub = self.create_publisher(
             Image, 'huskylens/image/marked', 10)
+        self._camera_info_pub = self.create_publisher(
+            CameraInfo, 'huskylens/camera_info', 10)
         self._bridge = CvBridge()
         self._last_marked_time = None
         self._marked_fps = 0.0
@@ -204,6 +224,39 @@ class HuskyLens2McpNode(Node):
         self._worker.start()
         self.create_timer(0.05, self._publish_latest)
         self.create_timer(0.5, self._publish_status)
+        self._camera_info = self._create_camera_info()
+
+    def _create_camera_info(self):
+        horizontal_fov, vertical_fov = camera_module_fov[self._camera_module]
+        focal_x = (self._img_w / 2.0) / math.tan(
+            math.radians(horizontal_fov / 2.0))
+        focal_y = (self._img_h / 2.0) / math.tan(
+            math.radians(vertical_fov / 2.0))
+        center_x = self._img_w / 2.0
+        center_y = self._img_h / 2.0
+
+        camera_info = CameraInfo()
+        camera_info.header.frame_id = self._frame_id
+        camera_info.width = self._img_w
+        camera_info.height = self._img_h
+        camera_info.distortion_model = 'plumb_bob'
+        camera_info.d = [0.0] * 5
+        camera_info.k = [
+            focal_x, 0.0, center_x,
+            0.0, focal_y, center_y,
+            0.0, 0.0, 1.0,
+        ]
+        camera_info.r = [
+            1.0, 0.0, 0.0,
+            0.0, 1.0, 0.0,
+            0.0, 0.0, 1.0,
+        ]
+        camera_info.p = [
+            focal_x, 0.0, center_x, 0.0,
+            0.0, focal_y, center_y, 0.0,
+            0.0, 0.0, 1.0, 0.0,
+        ]
+        return camera_info
 
     def _request_loop(self):
         period = 1.0 / max(self._poll_rate, 0.1)
@@ -281,6 +334,8 @@ class HuskyLens2McpNode(Node):
             return
 
         stamp = self.get_clock().now().to_msg()
+        self._camera_info.header.stamp = stamp
+        self._camera_info_pub.publish(self._camera_info)
         detections = self._json_items(latest)
         det_array = Detection2DArray()
         det_array.header.stamp = stamp
