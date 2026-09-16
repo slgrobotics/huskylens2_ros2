@@ -19,15 +19,12 @@ def generate_launch_description():
     pkg_dir = get_package_share_directory('huskylens2_ros2')
     default_config  = os.path.join(pkg_dir, 'config', 'huskylens2.yaml')
 
-    algorithm_arg = DeclareLaunchArgument(
-        'algorithm', default_value='object_recognition',
-        description='Initial HuskyLens 2 algorithm. '
-                    'Values: face, object, tracking, line, color, tag, '
-                    'gesture, pose, hand, ocr, qr, barcode')
-
     algorithm_id_arg = DeclareLaunchArgument(
         'algorithm_id', default_value='2',
-        description='HuskyLens application ID passed to the MCP tool')
+        description='HuskyLens application ID passed to the MCP tool.'
+        # 1=Face Recognition, 2=Object Recognition, 3=Line Tracking, 4=Color Recognition,
+        # 5=Tag Recognition, 6=Gesture Recognition, 7=Pose Recognition, 8=Hand Tracking,
+        # 9=OCR, 10=QR Code, 11=Barcode
 
     mcp_server_arg = DeclareLaunchArgument(
         'mcp_server', default_value='http://huskylens.local:3000',
@@ -50,7 +47,6 @@ def generate_launch_description():
         parameters=[
             LaunchConfiguration('params_file'),
             {
-                'algorithm':  LaunchConfiguration('algorithm'),
                 'algorithm_id': LaunchConfiguration('algorithm_id'),
                 'mcp_server': LaunchConfiguration('mcp_server'),
                 'poll_rate':  LaunchConfiguration('poll_rate'),

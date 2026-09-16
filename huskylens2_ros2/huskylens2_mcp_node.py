@@ -19,6 +19,19 @@ from sensor_msgs.msg import CompressedImage, Image
 from std_msgs.msg import String
 from vision_msgs.msg import Detection2D, Detection2DArray, ObjectHypothesisWithPose
 
+algorithm_id_to_name = {
+            1: 'Face Recognition',
+            2: 'Object Recognition',
+            3: 'Line Tracking',
+            4: 'Color Recognition',
+            5: 'Tag Recognition',
+            6: 'Gesture Recognition',
+            7: 'Pose Recognition',
+            8: 'Hand Tracking',
+            9: 'OCR',
+            10: 'QR Code',
+            11: 'Barcode',
+        }
 
 class McpClient:
     """Small requests-based MCP client using the server's SSE transport."""
@@ -88,19 +101,15 @@ class McpClient:
     def notify(self, method, params):
         self._post(method, params)
 
-    def select_application(self, requested_name):
-        application_names = {
-            'object_recognition': 'Object Recognition',
-            'object': 'Object Recognition',
-        }
-        selected = application_names.get(
-            str(requested_name).strip().lower(), requested_name)
+    def select_application(self, algorithm_id):
         self.request(
             'tools/call', {
                 'name': 'self.manage_applications.switch_application',
-                'arguments': {'algorithm': selected},
+                'arguments': {'algorithm': algorithm_id},
             })
-        return selected
+        # Determine the algorithm name from the ID for publishing to the ROS 2 topic.
+        algorithm_name = algorithm_id_to_name.get(algorithm_id, f'Unknown algorithm ({algorithm_id})')
+        return algorithm_name
 
     def request(self, method, params):
         request_id = self._next_id
@@ -135,7 +144,6 @@ class HuskyLens2McpNode(Node):
     def __init__(self):
         super().__init__('huskylens_mcp_node')
         self.declare_parameter('mcp_server', 'http://huskylens.local:3000')
-        self.declare_parameter('algorithm', 'object_recognition')
         self.declare_parameter('algorithm_id', 2)
         self.declare_parameter('poll_rate', 10.0)  # actual MCP response rate: about 1 Hz
         self.declare_parameter('frame_id', 'huskylens2_link')
@@ -144,7 +152,6 @@ class HuskyLens2McpNode(Node):
         self.declare_parameter('mcp_timeout', 15.0)
 
         server = self.get_parameter('mcp_server').value
-        self._algorithm = self.get_parameter('algorithm').value
         self._algorithm_id = int(self.get_parameter('algorithm_id').value)
         self._poll_rate = float(self.get_parameter('poll_rate').value)
         self._frame_id = self.get_parameter('frame_id').value
@@ -171,8 +178,8 @@ class HuskyLens2McpNode(Node):
         self._client = McpClient(server, timeout)
         self.get_logger().info(f'Connecting to HuskyLens MCP server at {server}')
         self._client.connect()
-        selected = self._client.select_application(self._algorithm)
-        self.get_logger().info(f'Active HuskyLens application: {selected}')
+        self._algorithm_name = self._client.select_application(self._algorithm_id)
+        self.get_logger().info(f'Active HuskyLens application: {self._algorithm_name}')
         self.get_logger().info('HuskyLens MCP session established')
 
         self._worker = threading.Thread(target=self._request_loop, daemon=True)
@@ -200,9 +207,9 @@ class HuskyLens2McpNode(Node):
                 try:
                     self.get_logger().info('Reconnecting to HuskyLens MCP server')
                     self._client.connect()
-                    selected = self._client.select_application(self._algorithm)
+                    self._algorithm_name = self._client.select_application(self._algorithm_id)
                     self.get_logger().info(
-                        f'Active HuskyLens application: {selected}')
+                        f'Active HuskyLens application: {self._algorithm_name}')
                 except Exception as reconnect_exc:
                     self.get_logger().warn(
                         f'MCP reconnect failed: {reconnect_exc}',
@@ -266,7 +273,7 @@ class HuskyLens2McpNode(Node):
             self._point_pub.publish(point)
 
         algorithm = String()
-        algorithm.data = self._algorithm
+        algorithm.data = self._algorithm_name
         self._algo_pub.publish(algorithm)
         self._publish_image(latest, stamp)
         self._publish_marked_image(latest, stamp, detections)
