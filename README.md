@@ -4,7 +4,17 @@ Back to [Main Project Home](https://github.com/slgrobotics/articubot_one/wiki)
 
 Uses Python (`ament_python`).
 
-Original I2C node (and credits for it to): https://github.com/irayfuego/robotica/blob/main/src/huskylens2_ros2/huskylens2_ros2/huskylens_node.py
+> Original I2C node (and credits for it to): https://github.com/irayfuego/robotica/blob/main/src/huskylens2_ros2/huskylens2_ros2/huskylens_node.py
+
+Contents:
+- [Device setup](https://github.com/slgrobotics/huskylens2_ros2/blob/main/README.md#device-setup)
+- [Build and run](https://github.com/slgrobotics/huskylens2_ros2#build-and-run)
+- [Camera FOV Specifications (HUSKYLENS 2 Plus Kit)](https://github.com/slgrobotics/huskylens2_ros2#camera-fov-specifications-huskylens-2-plus-kit)
+- [Depth Anything V2 HTTP Server](https://github.com/slgrobotics/huskylens2_ros2#depth-anything-v2-http-server)
+- [Depth node](https://github.com/slgrobotics/huskylens2_ros2#depth-node)
+- [Producing PointCloud2 from Depth topic](https://github.com/slgrobotics/huskylens2_ros2#producing-pointcloud2-from-depth-topic)
+
+-----------------------------
 
 ### Device setup
 
