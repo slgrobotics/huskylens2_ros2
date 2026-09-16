@@ -46,32 +46,44 @@ class McpClient:
         self._endpoint = None
 
     def connect(self):
-        if self._sse_response is not None:
-            self._sse_response.close()
-        self._session.close()
-        self._session = requests.Session()
-        self.events = queue.Queue()
-        self._endpoint = None
+        self.close()
+        session = requests.Session()
+        events = queue.Queue()
+        response = None
+        try:
+            # Bound both phases: connecting and waiting for the SSE headers.
+            response = session.get(
+                f'{self.server_url}/sse', stream=True,
+                timeout=(self.timeout, self.timeout))
+            response.raise_for_status()
+            self._session = session
+            self.events = events
+            self._sse_response = response
+            self._endpoint = None
+            self._next_id = 1
+            threading.Thread(
+                target=self._read_events,
+                args=(response, events),
+                daemon=True,
+            ).start()
 
-        response = self._session.get(
-            f'{self.server_url}/sse', stream=True,
-            timeout=(self.timeout, None))
-        response.raise_for_status()
-        self._sse_response = response
-        events = self.events
-        threading.Thread(
-            target=self._read_events, args=(response, events), daemon=True).start()
-
-        kind, value = events.get(timeout=self.timeout)
-        if kind != 'endpoint':
-            raise RuntimeError(f'Expected MCP endpoint, received {kind}: {value}')
-        self._endpoint = urljoin(f'{self.server_url}/sse', value)
-        self.request('initialize', {
-            'protocolVersion': '2024-11-05',
-            'capabilities': {},
-            'clientInfo': {'name': 'huskylens2-ros2', 'version': '1.0'},
-        })
-        self.notify('notifications/initialized', {})
+            kind, value = events.get(timeout=self.timeout)
+            if kind != 'endpoint':
+                raise RuntimeError(
+                    f'Expected MCP endpoint, received {kind}: {value}')
+            self._endpoint = urljoin(f'{self.server_url}/sse', value)
+            self.request('initialize', {
+                'protocolVersion': '2024-11-05',
+                'capabilities': {},
+                'clientInfo': {'name': 'huskylens2-ros2', 'version': '1.0'},
+            })
+            self.notify('notifications/initialized', {})
+        except Exception:
+            response.close() if response is not None else None
+            session.close()
+            self._sse_response = None
+            self._endpoint = None
+            raise
 
     def _read_events(self, response, events):
         kind = ''
@@ -91,6 +103,8 @@ class McpClient:
             events.put(('error', str(exc)))
 
     def _post(self, method, params, request_id=None):
+        if self._endpoint is None:
+            raise RuntimeError('MCP session is not connected')
         payload = {'jsonrpc': '2.0', 'method': method, 'params': params}
         if request_id is not None:
             payload['id'] = request_id
@@ -204,18 +218,27 @@ class HuskyLens2McpNode(Node):
             except Exception as exc:
                 self.get_logger().warn(
                     f'MCP request failed: {exc}', throttle_duration_sec=5.0)
-                try:
-                    self.get_logger().info('Reconnecting to HuskyLens MCP server')
-                    self._client.connect()
-                    self._algorithm_name = self._client.select_application(self._algorithm_id)
-                    self.get_logger().info(
-                        f'Active HuskyLens application: {self._algorithm_name}')
-                except Exception as reconnect_exc:
-                    self.get_logger().warn(
-                        f'MCP reconnect failed: {reconnect_exc}',
-                        throttle_duration_sec=5.0)
-                    self._stop_event.wait(2.0)
+                self._reconnect()
             self._stop_event.wait(max(0.0, period - (time.monotonic() - started)))
+
+    def _reconnect(self):
+        self.get_logger().info('Reconnecting to HuskyLens MCP server')
+        delay = 1.0
+        while not self._stop_event.is_set():
+            try:
+                self._client.connect()
+                self._algorithm_name = self._client.select_application(
+                    self._algorithm_id)
+                self.get_logger().info(
+                    f'Active HuskyLens application: {self._algorithm_name}')
+                self.get_logger().info('HuskyLens MCP session re-established')
+                return
+            except Exception as exc:
+                self.get_logger().warn(
+                    f'MCP reconnect failed: {exc}; retrying in {delay:.1f}s',
+                    throttle_duration_sec=5.0)
+                self._stop_event.wait(delay)
+                delay = min(delay * 2.0, 10.0)
 
     @staticmethod
     def _json_items(result):
