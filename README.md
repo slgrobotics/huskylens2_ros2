@@ -225,6 +225,52 @@ Depth image returned by *Depth Anything V2 server* and published by *depth_node*
 
 <img width="757" height="567" alt="Screenshot from 2026-09-15 17-07-47" src="https://github.com/user-attachments/assets/bb1fea82-c46f-45af-97d7-a5b0faf03fe5" />
 
+### Producing PointCloud2 from Depth topic
+
+The standard ROS 2 package for this is [depth_image_proc](https://github.com/ros-perception/image_pipeline), specifically its *PointCloudXyzNode*. 
+It takes a metric depth *sensor_msgs/Image* plus the corresponding *sensor_msgs/CameraInfo* and publishes *sensor_msgs/PointCloud2*.
+The implementation supports 16UC1 depth images.
+
+There is fair amount of [documentation](https://docs.ros.org/en/rolling/p/image_pipeline/) available.
+
+The package can be installed from the binaries:
+```
+sudo apt install ros-${ROS_DISTRO}-image-pipeline
+```
+
+When using Depth Anything pipeline, the intended flow is:
+```
+     Camera Publisher Node ──────┐
+             │                   │
+             ▼                   │
+       sensor_msgs/Image         │
+             ↓                   │
+     ROS 2 client (depth_node)   │
+             ↓ HTTP POST         │
+       Depth Anything server     │
+             ↓                   │
+       16-bit PNG, millimeters   │
+             ↓ HTTP              │
+     ROS 2 client (depth_node)   │
+             │                   │
+             ▼                   ▼
+      sensor_msgs/Image    sensor_msgs/CameraInfo
+      (encoding: 16UC1)          ↓
+             ↓                   ↓
+      depth_image_proc::PointCloudXyzNode
+             │
+             ▼
+      sensor_msgs/PointCloud2
+```
+**Note:**
+- you need *CameraInfo*, not just the depth image. The conversion needs the *camera intrinsics fx, fy, cx, cy* to back-project each depth pixel (distance from camera) *(u,v,Z)* into 3D space *XYZ*
+- If you also want an *XYZRGB colored point cloud*, *depth_image_proc* has a *PointCloudXyzrgbNode*, which combines depth with the RGB image.
+
+For HuskyLens 2 run conversion as follows:
+```
+ros2 launch huskylens2_ros2 point_cloud_node.launch.py
+```
+
 -------------------------
 
 Back to [Main Project Home](https://github.com/slgrobotics/articubot_one/wiki)
