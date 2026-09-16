@@ -31,6 +31,9 @@ class DepthNode(Node):
 
     def __init__(self):
         super().__init__('depth_node')
+
+        self.get_logger().info('Starting depth_node')
+
         self.declare_parameter(
             'input_topic', 'huskylens/image/compressed')
         self.declare_parameter(
@@ -59,9 +62,11 @@ class DepthNode(Node):
             target=self._process_frames, daemon=True)
         self._worker.start()
 
-        self.get_logger().info(
-            f'Converting {input_topic} with {self._depth_server} '
-            f'and publishing {output_topic}')
+        self.get_logger().info('Pipeline:')
+        self.get_logger().info(f' - subscribing to:              {input_topic}')
+        self.get_logger().info(f' - converting via server at:    {self._depth_server}')
+        self.get_logger().info(f' - publishing depth images to:  {output_topic}')
+
 
     def _on_image(self, message):
         try:
@@ -72,6 +77,7 @@ class DepthNode(Node):
                 self._frames.put_nowait(message)
             except queue.Empty:
                 pass
+
 
     def _process_frames(self):
         while not self._stop_event.is_set():
@@ -115,6 +121,7 @@ class DepthNode(Node):
                 self.get_logger().warning(
                     f'Invalid depth response: {exc}',
                     throttle_duration_sec=5.0)
+
 
     def destroy_node(self):
         self._stop_event.set()
