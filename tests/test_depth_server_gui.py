@@ -77,6 +77,13 @@ depth_mm = cv2.imdecode(
     np.frombuffer(response.content, np.uint8),
     cv2.IMREAD_UNCHANGED,
 )
+original = cv2.imdecode(
+    np.frombuffer(image_data, np.uint8),
+    cv2.IMREAD_COLOR,
+)
+
+if original is None or depth_mm is None:
+    raise RuntimeError("Could not decode the original or depth image")
 
 print("Shape:", depth_mm.shape)
 print("dtype:", depth_mm.dtype)
@@ -88,7 +95,18 @@ cv2.imwrite("received_depth.png", depth_mm)
 print("Saved received_depth.png")
 
 depth_vis = colorize_depth(depth_mm)
-window_name = "Received depth"
+panel_height = min(original.shape[0], depth_vis.shape[0])
+original_display = cv2.resize(
+    original,
+    (round(original.shape[1] * panel_height / original.shape[0]), panel_height),
+)
+depth_display = cv2.resize(
+    depth_vis,
+    (round(depth_vis.shape[1] * panel_height / depth_vis.shape[0]), panel_height),
+)
+original_width = original_display.shape[1]
+depth_width = depth_display.shape[1]
+window_name = "Original | Depth"
 cursor = {"x": None, "y": None}
 
 cv2.namedWindow(window_name, cv2.WINDOW_NORMAL)
@@ -96,8 +114,9 @@ cv2.resizeWindow(window_name, 1280, 720)
 cv2.setMouseCallback(window_name, update_cursor, cursor)
 
 while True:
-    display = depth_vis.copy()
+    display = np.hstack((original_display, depth_display))
     height, width = depth_mm.shape[:2]
+    depth_x = depth_y = None
 
     if cursor["x"] is not None and cursor["y"] is not None:
         try:
@@ -105,17 +124,35 @@ while True:
                 cv2.getWindowImageRect(window_name)
             )
         except cv2.error:
-            window_width = width
-            window_height = height
+            window_width = display.shape[1]
+            window_height = display.shape[0]
 
         if window_width > 0 and window_height > 0:
-            depth_x = round(cursor["x"] * width / window_width)
-            depth_y = round(cursor["y"] * height / window_height)
+            image_scale = min(
+                window_width / display.shape[1],
+                window_height / display.shape[0],
+            )
+            rendered_width = round(display.shape[1] * image_scale)
+            rendered_height = round(display.shape[0] * image_scale)
+            image_offset_x = (window_width - rendered_width) // 2
+            image_offset_y = (window_height - rendered_height) // 2
+            image_x = round((cursor["x"] - image_offset_x) / image_scale)
+            image_y = round((cursor["y"] - image_offset_y) / image_scale)
+            if (
+                original_width <= image_x < original_width + depth_width
+                and 0 <= image_y < display.shape[0]
+            ):
+                depth_x = round(
+                    (image_x - original_width) * width / depth_width
+                )
+                depth_y = round(image_y * height / display.shape[0])
+
+        if depth_x is not None and depth_y is not None:
             depth_x = int(np.clip(depth_x, 0, width - 1))
             depth_y = int(np.clip(depth_y, 0, height - 1))
             depth_value = int(depth_mm[depth_y, depth_x])
 
-            display_x = round(depth_x * display.shape[1] / width)
+            display_x = original_width + round(depth_x * depth_width / width)
             display_y = round(depth_y * display.shape[0] / height)
             cv2.drawMarker(
                 display,
@@ -156,8 +193,28 @@ while True:
 
     cv2.putText(
         display,
-        "Move cursor to inspect depth | Press q or ESC to exit",
+        "Original",
         (20, 35),
+        cv2.FONT_HERSHEY_SIMPLEX,
+        0.7,
+        (255, 255, 255),
+        2,
+        cv2.LINE_AA,
+    )
+    cv2.putText(
+        display,
+        "Depth",
+        (original_width + 20, 35),
+        cv2.FONT_HERSHEY_SIMPLEX,
+        0.7,
+        (255, 255, 255),
+        2,
+        cv2.LINE_AA,
+    )
+    cv2.putText(
+        display,
+        "Move cursor to inspect depth | Press q or ESC to exit",
+        (20, display.shape[0] - 20),
         cv2.FONT_HERSHEY_SIMPLEX,
         0.7,
         (255, 255, 255),
