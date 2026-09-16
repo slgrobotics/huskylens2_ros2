@@ -11,11 +11,9 @@ Make sure that the Depth Anything V2 server is running, e.g.:
   ./depth_server.py
 
 Examples:
-ros2 run huskylens2_ros2 depth_node
+  ros2 launch huskylens2_ros2 depth_node.launch.py
 
-  or
-
-ros2 run huskylens2_ros2 depth_node --ros-args -p depth_server:=http://127.0.0.1:5001/depth
+  ros2 launch huskylens2_ros2 depth_node.launch.py depth_server:=http://127.0.0.1:5001/depth
 
 """
 
