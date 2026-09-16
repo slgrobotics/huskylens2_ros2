@@ -119,33 +119,16 @@ while True:
     depth_x = depth_y = None
 
     if cursor["x"] is not None and cursor["y"] is not None:
-        try:
-            _window_x, _window_y, window_width, window_height = (
-                cv2.getWindowImageRect(window_name)
+        image_x = cursor["x"]
+        image_y = cursor["y"]
+        if (
+            original_width <= image_x < original_width + depth_width
+            and 0 <= image_y < display.shape[0]
+        ):
+            depth_x = round(
+                (image_x - original_width) * width / depth_width
             )
-        except cv2.error:
-            window_width = display.shape[1]
-            window_height = display.shape[0]
-
-        if window_width > 0 and window_height > 0:
-            image_scale = min(
-                window_width / display.shape[1],
-                window_height / display.shape[0],
-            )
-            rendered_width = round(display.shape[1] * image_scale)
-            rendered_height = round(display.shape[0] * image_scale)
-            image_offset_x = (window_width - rendered_width) // 2
-            image_offset_y = (window_height - rendered_height) // 2
-            image_x = round((cursor["x"] - image_offset_x) / image_scale)
-            image_y = round((cursor["y"] - image_offset_y) / image_scale)
-            if (
-                original_width <= image_x < original_width + depth_width
-                and 0 <= image_y < display.shape[0]
-            ):
-                depth_x = round(
-                    (image_x - original_width) * width / depth_width
-                )
-                depth_y = round(image_y * height / display.shape[0])
+            depth_y = round(image_y * height / display.shape[0])
 
         if depth_x is not None and depth_y is not None:
             depth_x = int(np.clip(depth_x, 0, width - 1))
