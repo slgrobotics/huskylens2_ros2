@@ -210,7 +210,7 @@ ros2 run huskylens2_ros2 depth_node --ros-args -p depth_server:=http://127.0.0.1
                         └──┬───────────────────────┘
                            ▼ HTTP response -  16-bit depth map
      ROS 2 depth_node -----┘
-                 │  `huskylens/image/depth` topic
+                 │  `huskylens/depth/image` topic
                  ▼
         Any ROS2 subscribers
 ```
@@ -221,7 +221,7 @@ This is how an image from HuskyLens 2 is transferred:
 
 <img width="757" height="567" alt="Screenshot from 2026-09-15 17-08-00" src="https://github.com/user-attachments/assets/866af907-b61e-4dff-a46e-b22270b31044" />
 
-Depth image returned by *Depth Anything V2 server* and published by *depth_node* as `huskylens/image/depth`:
+Depth image returned by *Depth Anything V2 server* and published by *depth_node* as `huskylens/depth/image`:
 
 <img width="757" height="567" alt="Screenshot from 2026-09-15 17-07-47" src="https://github.com/user-attachments/assets/bb1fea82-c46f-45af-97d7-a5b0faf03fe5" />
 

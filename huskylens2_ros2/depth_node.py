@@ -37,7 +37,7 @@ class DepthNode(Node):
         self.declare_parameter(
             'input_topic', 'huskylens/image/compressed')
         self.declare_parameter(
-            'output_topic', 'huskylens/image/depth')
+            'output_topic', 'huskylens/depth/image')
         self.declare_parameter(
             'depth_server', 'http://127.0.0.1:5001/depth')
         self.declare_parameter('request_timeout', 5.0)

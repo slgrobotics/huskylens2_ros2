@@ -26,7 +26,7 @@ huskylens2_mcp_node:
 depth_node:
   ros__parameters:
     input_topic:  huskylens/image/compressed
-    output_topic: huskylens/image/depth
+    output_topic: huskylens/depth/image
     depth_server: "http://127.0.0.1:5001/depth"
     request_timeout: 5.0
     queue_size: 1
