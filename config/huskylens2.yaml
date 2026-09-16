@@ -27,6 +27,7 @@ depth_node:
   ros__parameters:
     input_topic:  huskylens/image/compressed
     output_topic: huskylens/depth/image
+    camera_info_output_topic: huskylens/depth/camera_info  # re-published with same timestamp as depth image
     depth_server: "http://127.0.0.1:5001/depth"
     request_timeout: 5.0
     queue_size: 1

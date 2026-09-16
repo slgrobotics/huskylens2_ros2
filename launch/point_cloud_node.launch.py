@@ -22,7 +22,7 @@ def generate_launch_description():
             name='depth_point_cloud',
             output='screen',
             remappings=[
-                ('camera_info', '/huskylens/camera_info'),
+                ('camera_info', '/huskylens/depth/camera_info'),  # must be synchronized with depth image 
                 ('image_rect', '/huskylens/depth/image'),
                 ('points', '/huskylens/depth/points'),
             ],
