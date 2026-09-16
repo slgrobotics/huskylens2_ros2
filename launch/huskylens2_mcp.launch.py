@@ -13,31 +13,39 @@ from launch import LaunchDescription
 from launch.actions import DeclareLaunchArgument
 from launch.substitutions import LaunchConfiguration
 from launch_ros.actions import Node
-
+from launch_ros.parameter_descriptions import ParameterValue
 
 def generate_launch_description():
     pkg_dir = get_package_share_directory('huskylens2_ros2')
-    default_config  = os.path.join(pkg_dir, 'config', 'huskylens2.yaml')
+    default_config = os.path.join(pkg_dir, 'config', 'huskylens2.yaml')
+
+    # default values here override the YAML file, but can be overridden by launch arguments
+
+    camera_module_arg = DeclareLaunchArgument(
+        'camera_module',
+        default_value='wide_angle',
+        description='Camera module installed: stock or wide_angle')
 
     algorithm_id_arg = DeclareLaunchArgument(
-        'algorithm_id', default_value='2',
-        description='HuskyLens application ID passed to the MCP tool.'
-        # 1=Face Recognition, 2=Object Recognition, 3=Line Tracking, 4=Color Recognition,
-        # 5=Tag Recognition, 6=Gesture Recognition, 7=Pose Recognition, 8=Hand Tracking,
-        # 9=OCR, 10=QR Code, 11=Barcode
+        'algorithm_id',
+        default_value='2',
+        description=(
+            'HuskyLens application ID passed to the MCP tool: '
+            '1=Face Recognition, 2=Object Recognition, 3=Line Tracking, '
+            '4=Color Recognition, 5=Tag Recognition, 6=Gesture Recognition, '
+            '7=Pose Recognition, 8=Hand Tracking, 9=OCR, 10=QR Code, 11=Barcode'
+        )        
     )
 
     mcp_server_arg = DeclareLaunchArgument(
-        'mcp_server', default_value='http://huskylens.local:3000',
+        'mcp_server', 
+        default_value='http://huskylens.local:3000',
         description='HuskyLens MCP server base URL, without /sse')
 
     poll_rate_arg = DeclareLaunchArgument(
-        'poll_rate', default_value='10.0',
+        'poll_rate',
+        default_value='10.0',
         description='MCP request frequency in Hz')
-
-    camera_module_arg = DeclareLaunchArgument(
-        'camera_module', default_value='wide_angle',
-        description='Camera module installed: stock or wide_angle')
 
     config_arg = DeclareLaunchArgument(
         'params_file',
@@ -52,19 +60,25 @@ def generate_launch_description():
         parameters=[
             LaunchConfiguration('params_file'),
             {
-                'algorithm_id': LaunchConfiguration('algorithm_id'),
-                'mcp_server': LaunchConfiguration('mcp_server'),
-                'poll_rate':  LaunchConfiguration('poll_rate'),
                 'camera_module': LaunchConfiguration('camera_module'),
+                'algorithm_id': ParameterValue(
+                    LaunchConfiguration('algorithm_id'),
+                    value_type=int
+                ),
+                'mcp_server': LaunchConfiguration('mcp_server'),
+                'poll_rate': ParameterValue(
+                    LaunchConfiguration('poll_rate'),
+                    value_type=float
+                ),
             },
         ],
     )
 
     return LaunchDescription([
+        camera_module_arg,
         algorithm_id_arg,
         mcp_server_arg,
         poll_rate_arg,
-        camera_module_arg,
         config_arg,
         huskylens_node,
     ])

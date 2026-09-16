@@ -31,8 +31,11 @@ def generate_launch_description():
     pkg_dir = get_package_share_directory('huskylens2_ros2')
     default_config  = os.path.join(pkg_dir, 'config', 'huskylens2.yaml')
 
+    # default values here override the YAML file, but can be overridden by launch arguments
+
     depth_server_arg = DeclareLaunchArgument(
-        'depth_server', default_value='http://127.0.0.1:5001/depth',
+        'depth_server',
+        default_value='http://127.0.0.1:5001/depth',
         description='Depth Anything V2 server base URL')
 
     config_arg = DeclareLaunchArgument(

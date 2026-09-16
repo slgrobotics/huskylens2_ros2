@@ -19,14 +19,18 @@ def generate_launch_description():
     pkg_dir = get_package_share_directory('huskylens2_ros2')
     default_config  = os.path.join(pkg_dir, 'config', 'huskylens2.yaml')
 
+    # default values here override the YAML file, but can be overridden by launch arguments
+
     algorithm_arg = DeclareLaunchArgument(
-        'algorithm', default_value='object_recognition',
+        'algorithm',
+        default_value='object_recognition',
         description='Initial HuskyLens 2 algorithm. '
                     'Values: face, object, tracking, line, color, tag, '
                     'gesture, pose, hand, ocr, qr, barcode')
 
     poll_rate_arg = DeclareLaunchArgument(
-        'poll_rate', default_value='10.0',
+        'poll_rate',
+        default_value='10.0',
         description='I2C read frequency in Hz')
 
     config_arg = DeclareLaunchArgument(
