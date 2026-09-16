@@ -94,18 +94,13 @@ def connect(session):
     return endpoint, events
 
 
-def select_application(session, endpoint, events, requested_name):
-    application_names = {
-        'object_recognition': 'Object Recognition',
-        'object': 'Object Recognition',
-    }
-    selected = application_names.get(
-        str(requested_name).strip().lower(), requested_name)
-    send(session, endpoint, events, 'tools/call', {
+def select_application(session, endpoint, events, algorithm_id):
+    result = send(session, endpoint, events, 'tools/call', {
         'name': 'self.manage_applications.switch_application',
-        'arguments': {'algorithm': selected},
+        'arguments': {'algorithm': algorithm_id},
     }, 3)
-    return selected
+    print(f'Switch response: {result}', flush=True)
+
 
 def recognition_items(result):
     for item in result.get('content', []):
@@ -160,9 +155,7 @@ def main():
         print(
             f'Switching HuskyLens to {ALGORITHM_ID} / object_recognition...',
             flush=True)
-        selected = select_application(
-            session, endpoint, events, 'object_recognition')
-        print(f'Active HuskyLens application: {selected}', flush=True)
+        select_application(session, endpoint, events, ALGORITHM_ID)
 
         last_time = None
         fps = 0.0
@@ -177,10 +170,7 @@ def main():
                 time.sleep(2)
                 try:
                     endpoint, events = connect(session)
-                    selected = select_application(
-                        session, endpoint, events, 'object_recognition')
-                    print(
-                        f'Active HuskyLens application: {selected}', flush=True)
+                    select_application(session, endpoint, events, ALGORITHM_ID)
                 except Exception as reconnect_exc:
                     print(
                         f'MCP reconnect failed: {reconnect_exc}; retrying...',
