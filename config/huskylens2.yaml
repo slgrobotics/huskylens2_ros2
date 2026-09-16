@@ -20,6 +20,7 @@ huskylens2_mcp_node:
     poll_rate:    10.0     # Hz (actual MCP response rate: about 1 Hz)
     image_width:  640      # Reference resolution used to normalize coordinates
     image_height: 480
+    mcp_timeout:  5.0
 
 depth_node:
   ros__parameters:

@@ -163,7 +163,7 @@ class HuskyLens2McpNode(Node):
         self.declare_parameter('frame_id', 'huskylens2_link')
         self.declare_parameter('image_width', 640)
         self.declare_parameter('image_height', 480)
-        self.declare_parameter('mcp_timeout', 15.0)
+        self.declare_parameter('mcp_timeout', 5.0)
 
         server = self.get_parameter('mcp_server').value
         self._algorithm_id = int(self.get_parameter('algorithm_id').value)
@@ -172,6 +172,7 @@ class HuskyLens2McpNode(Node):
         self._img_w = int(self.get_parameter('image_width').value)
         self._img_h = int(self.get_parameter('image_height').value)
         timeout = float(self.get_parameter('mcp_timeout').value)
+        self._status_timeout = max(timeout, 0.1)
 
         self._det_pub = self.create_publisher(
             Detection2DArray, 'huskylens/detections', 10)
@@ -179,6 +180,8 @@ class HuskyLens2McpNode(Node):
             Point, 'huskylens/tracked_object', 10)
         self._algo_pub = self.create_publisher(
             String, 'huskylens/algorithm', 10)
+        self._status_pub = self.create_publisher(
+            String, 'huskylens/status', 10)
         self._image_pub = self.create_publisher(
             CompressedImage, 'huskylens/image/compressed', 10)
         self._marked_image_pub = self.create_publisher(
@@ -186,6 +189,7 @@ class HuskyLens2McpNode(Node):
         self._bridge = CvBridge()
         self._last_marked_time = None
         self._marked_fps = 0.0
+        self._last_request_success = None
 
         self._responses = queue.Queue(maxsize=2)
         self._stop_event = threading.Event()
@@ -199,6 +203,7 @@ class HuskyLens2McpNode(Node):
         self._worker = threading.Thread(target=self._request_loop, daemon=True)
         self._worker.start()
         self.create_timer(0.05, self._publish_latest)
+        self.create_timer(0.5, self._publish_status)
 
     def _request_loop(self):
         period = 1.0 / max(self._poll_rate, 0.1)
@@ -210,6 +215,7 @@ class HuskyLens2McpNode(Node):
                         'name': 'self.get_recognition_result',
                         'arguments': {'algorithm': self._algorithm_id},
                     })
+                self._last_request_success = time.monotonic()
                 try:
                     self._responses.put_nowait(result)
                 except queue.Full:
@@ -220,6 +226,17 @@ class HuskyLens2McpNode(Node):
                     f'MCP request failed: {exc}', throttle_duration_sec=5.0)
                 self._reconnect()
             self._stop_event.wait(max(0.0, period - (time.monotonic() - started)))
+
+    def _publish_status(self):
+        status = String()
+        last_success = self._last_request_success
+        status.data = (
+            'up'
+            if last_success is not None
+            and time.monotonic() - last_success <= self._status_timeout
+            else 'down'
+        )
+        self._status_pub.publish(status)
 
     def _reconnect(self):
         self.get_logger().info('Reconnecting to HuskyLens MCP server')
