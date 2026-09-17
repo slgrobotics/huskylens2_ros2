@@ -308,6 +308,21 @@ Values delivered by *depth_server.py* seem to depend on camera FOV, and need som
 
 #### Calibration process
 
+**Note:** You need to run four processes in different terminals (and also RViz2):
+```
+# "Depth Anything V2" HTTP server waits for an image and returns depth map image:
+(venv) xxx@yyy:~/husky_ws/src/huskylens2_ros2/depth_anything$ ./depth_server.py
+
+# ROS2 node querying HuskyLens 2 MCP Server for image and detections:
+xxx@yyy:~/husky_ws$ ros2 launch huskylens2_ros2 huskylens2_mcp.launch.py camera_module:="stock"
+
+# ROS2 node takes image and uses HTTP Server to convert camera image to depth map image:
+xxx@yyy:~/husky_ws$ ros2 launch huskylens2_ros2 depth_node.launch.py
+
+# ROS2 node to convert depth map image to PointCloud2:
+xxx@yyy:~/husky_ws$ ros2 launch huskylens2_ros2 point_cloud_rgb_node.launch.py
+```
+
 The following line in `launch/huskylens2_mcp.launch.py` should match the position of your camera:
 ```
 '--z', '0.57',    # Z translation in meters (camera height above ground)
@@ -326,7 +341,7 @@ note the distance between two objects at the same distance from the camera.
 
 Adjust the `camera_module:="...,..."` values in `huskylens2_mcp_module` (launch, yaml) until that distance matches reality.
 
-Round objects should be round, the second value is responsible for it.
+3. Round objects should be round, adjust the second value which is responsible for it.
 
 **Note:** use "map" as *Fixed Frame* in RViz2.
 
