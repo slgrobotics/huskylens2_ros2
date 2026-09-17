@@ -12,6 +12,7 @@ Contents:
 - [Camera FOV Specifications (HUSKYLENS 2 Plus Kit)](https://github.com/slgrobotics/huskylens2_ros2#camera-fov-specifications-huskylens-2-plus-kit)
 - [Depth Anything V2 HTTP Server](https://github.com/slgrobotics/huskylens2_ros2#depth-anything-v2-http-server)
 - [Depth node](https://github.com/slgrobotics/huskylens2_ros2#depth-node)
+- [Depth To Laser Scan node](https://github.com/slgrobotics/huskylens2_ros2#depth-to-laser-scan-node)
 - [Producing PointCloud2 from Depth topic](https://github.com/slgrobotics/huskylens2_ros2#producing-pointcloud2-from-depth-topic)
 - [Calibrating Pointcloud](https://github.com/slgrobotics/huskylens2_ros2#calibrating-pointcloud)
 
@@ -236,6 +237,15 @@ Depth image returned by *Depth Anything V2 server* and published by *depth_node*
 
 <img width="757" height="567" alt="Screenshot from 2026-09-15 17-07-47" src="https://github.com/user-attachments/assets/bb1fea82-c46f-45af-97d7-a5b0faf03fe5" />
 
+### Depth To Laser Scan Node
+
+This node subscribes to *depth image* and *CameraInfo* topics, then publishes a
+horizontal *LaserScan*. Each scan ray contains the nearest valid depth sample from the depth image, within the height limits, projected to X,Y plane at a given height.
+
+```
+ros2 run huskylens2_ros2 depth_to_laserscan_node
+```
+
 ### Producing PointCloud2 from Depth topic
 
 The standard ROS 2 package for this is [depth_image_proc](https://github.com/ros-perception/image_pipeline), specifically its *PointCloudXyzNode*. 
@@ -279,6 +289,7 @@ and even webcams with their ROS2 drivers nodes produce images and *CloudInfo* to
 - you need *CameraInfo*, not just the depth image. The conversion needs the *camera intrinsics fx, fy, cx, cy* to back-project each depth pixel (distance from camera) *(u,v,Z)* into 3D space *XYZ*
 - If you also want an *XYZRGB colored point cloud*, *depth_image_proc* has a *PointCloudXyzrgbNode*, which combines depth with the RGB image.
 - If you need to reduce your *CloudPoint2* to a *LaserScan* - follow [this guide](https://github.com/slgrobotics/robots_bringup/blob/main/Docs/Sensors/OAK-D_Lite.md#converting-pointcloud2-to-laserscan).
+Or just use *Depth To Laser Scan Node*
 
 For HuskyLens 2 run conversion as follows:
 ```
