@@ -13,6 +13,7 @@ Contents:
 - [Depth Anything V2 HTTP Server](https://github.com/slgrobotics/huskylens2_ros2#depth-anything-v2-http-server)
 - [Depth node](https://github.com/slgrobotics/huskylens2_ros2#depth-node)
 - [Producing PointCloud2 from Depth topic](https://github.com/slgrobotics/huskylens2_ros2#producing-pointcloud2-from-depth-topic)
+- [Calibrating Pointcloud](https://github.com/slgrobotics/huskylens2_ros2#calibrating-pointcloud)
 
 -----------------------------
 
@@ -298,6 +299,44 @@ ros2 launch huskylens2_ros2 point_cloud_rgb_node.launch.py
 <img alt="PointCloud2 in RViz RGB color" src="https://github.com/user-attachments/assets/39f565d6-7001-4ee3-a5ed-700c432bca81" />
 
 <img alt="RQT_graph" src="https://github.com/user-attachments/assets/b4ccc447-899f-492b-885b-fa089bcce340" />
+
+### Calibrating Pointcloud
+
+When viewed in RViz2 over the one meter grid the pointcloud might be significantly distorted.
+
+Values delivered by *depth_server.py* seem to depend on camera FOV, and need some scaling to be brought close to reality.
+
+#### Calibration process
+
+The following line in `launch/huskylens2_mcp.launch.py` should match the position of your camera:
+```
+'--z', '0.57',    # Z translation in meters (camera height above ground)
+```
+
+1. Note some objects and the distance to them (depth dimensions) from the camera; adjust parameter below in `depth_server.py` while observing the scene in RViz2.
+
+```
+# experimental scale factor for depth values:
+DEPTH_MULTIPLIER = 1.15   # for HuskyLens 2 stock camera module
+# DEPTH_MULTIPLIER = 0.5  # for HuskyLens 2 wide-angle camera module
+```
+
+2. When using different cameras, horizontal dimensions can also be distorted. Once the depth server is calibrated, 
+note the distance between two objects at the same distance from the camera.
+
+Adjust the `camera_module:="...,..."` values in `huskylens2_mcp_module` (launch, yaml) until that distance matches reality.
+
+Round objects should be round, the second value is responsible for it.
+
+**Note:** use "map" as *Fixed Frame* in RViz2.
+
+> Wide Angle camera calibrated:
+<img alt="Wide Angle calibrated" src="https://github.com/user-attachments/assets/f87a93e3-0528-4588-b2e8-717d1155b56d" />
+
+---------------------
+
+> Stock camera calibrated:
+<img alt="Stock camera calibrated" src="https://github.com/user-attachments/assets/339f18de-ce2a-45fb-86bd-f50fdbc14359" />
 
 
 -------------------------
