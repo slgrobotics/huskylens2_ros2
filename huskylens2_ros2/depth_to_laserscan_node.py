@@ -23,7 +23,7 @@ ros2 run huskylens2_ros2 depth_to_laserscan_node
 
 """
 
-class DepthNode(Node):
+class DepthToLaserScanNode(Node):
 
     def __init__(self):
         super().__init__('depth_to_laserscan_node')
@@ -171,7 +171,7 @@ def main(args=None):
     rclpy.init(args=args)
     node = None
     try:
-        node = DepthNode()
+        node = DepthToLaserScanNode()
         rclpy.spin(node)
     except (KeyboardInterrupt, ExternalShutdownException):
         pass
