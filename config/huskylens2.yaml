@@ -31,3 +31,15 @@ depth_node:
     depth_server: "http://127.0.0.1:5001/depth"
     request_timeout: 5.0
     queue_size: 1
+
+depth_to_laserscan_node:
+  ros__parameters:
+    target_frame: huskylens2_link_optical
+    input_topic:  huskylens/depth/image
+    output_topic: huskylens/scan
+    camera_info_topic: huskylens/depth/camera_info
+    min_height: 0.03
+    max_height: 2.0
+    range_min: 0.2
+    range_max: 5.0
+    scan_time: 0.1

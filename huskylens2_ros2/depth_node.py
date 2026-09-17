@@ -20,7 +20,7 @@ from sensor_msgs.msg import CameraInfo, CompressedImage, Image
 This node subscribes to a compressed image topic, sends the images to an HTTP depth server,
  and publishes the resulting depth maps as 16-bit single-channel images.
 
-ros2 run huskylens2_ros2 depth_node
+ros2 launch huskylens2_ros2 depth_node.launch.py
 
   or
 
