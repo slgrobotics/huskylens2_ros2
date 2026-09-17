@@ -273,9 +273,11 @@ When using Depth Anything pipeline, the intended flow is:
       sensor_msgs/PointCloud2
 ```
 **Note:**
-- you don't need *HuskyLens 2* to implement this pipeline. Regular cameras and even webcams with their ROS2 drivers nodes produce images and *CloudInfo* to feed the pipeline.
+- you don't need *HuskyLens 2* to implement this pipeline. Regular [cameras](https://github.com/slgrobotics/robots_bringup/blob/main/Docs/Sensors/Camera.md)
+and even webcams with their ROS2 drivers nodes produce images and *CloudInfo* to feed the pipeline.
 - you need *CameraInfo*, not just the depth image. The conversion needs the *camera intrinsics fx, fy, cx, cy* to back-project each depth pixel (distance from camera) *(u,v,Z)* into 3D space *XYZ*
 - If you also want an *XYZRGB colored point cloud*, *depth_image_proc* has a *PointCloudXyzrgbNode*, which combines depth with the RGB image.
+- If you need to reduce your *CloudPoint2* to a *LaserScan* - follow [this guide](https://github.com/slgrobotics/robots_bringup/blob/main/Docs/Sensors/OAK-D_Lite.md#converting-pointcloud2-to-laserscan).
 
 For HuskyLens 2 run conversion as follows:
 ```
