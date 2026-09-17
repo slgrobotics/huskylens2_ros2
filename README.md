@@ -273,6 +273,7 @@ When using Depth Anything pipeline, the intended flow is:
       sensor_msgs/PointCloud2
 ```
 **Note:**
+- you don't need *HuskyLens 2* to implement this pipeline. Regular cameras and even webcams with their ROS2 drivers nodes produce images and *CloudInfo* to feed the pipeline.
 - you need *CameraInfo*, not just the depth image. The conversion needs the *camera intrinsics fx, fy, cx, cy* to back-project each depth pixel (distance from camera) *(u,v,Z)* into 3D space *XYZ*
 - If you also want an *XYZRGB colored point cloud*, *depth_image_proc* has a *PointCloudXyzrgbNode*, which combines depth with the RGB image.
 
@@ -285,12 +286,17 @@ ros2 launch huskylens2_ros2 point_cloud_node.launch.py
 
 <img alt="PointCloud2 in RViz axis color" src="https://github.com/user-attachments/assets/752ef786-574f-41e9-82d1-50686b1652a9" />
 
-And, with
+----------------------
+
+And, with *PointCloudXyzrgbNode*:
 ```
 ros2 launch huskylens2_ros2 point_cloud_rgb_node.launch.py
 ```
 
 <img alt="PointCloud2 in RViz RGB color" src="https://github.com/user-attachments/assets/39f565d6-7001-4ee3-a5ed-700c432bca81" />
+
+<img alt="RQT_graph" src="https://github.com/user-attachments/assets/b4ccc447-899f-492b-885b-fa089bcce340" />
+
 
 -------------------------
 
