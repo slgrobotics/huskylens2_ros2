@@ -36,12 +36,12 @@ class DepthNode(Node):
             'camera_info_topic', 'huskylens/camera_info')
         self.declare_parameter(
             'output_topic', 'huskylens/scan')
-        self.declare_parameter('target_frame', 'huskylens2_link_optical')
-        self.declare_parameter('min_height', 0.03)
-        self.declare_parameter('max_height', 2.0)
-        self.declare_parameter('range_min', 0.2)
-        self.declare_parameter('range_max', 5.0)
-        self.declare_parameter('scan_time', 0.1)
+        self.declare_parameter('target_frame', 'huskylens2_link')
+        self.declare_parameter('min_height', -0.1)  # relative to camera optical center
+        self.declare_parameter('max_height',  0.1)
+        self.declare_parameter('range_min',   0.2)
+        self.declare_parameter('range_max',  10.0)
+        self.declare_parameter('scan_time',   0.1)
 
         input_topic = self.get_parameter('input_topic').value
         camera_info_topic = self.get_parameter('camera_info_topic').value
@@ -74,9 +74,10 @@ class DepthNode(Node):
         self.get_logger().info(
             f' - publishing LaserScan to:       {output_topic}')
         self.get_logger().info(
-            f' - height limits:                  '
+            f' - height limits:                 '
             f'{self._min_height:.3f}..{self._max_height:.3f} m')
-
+        self.get_logger().info(
+            f' - target frame:                  {self._target_frame}')
 
     def _on_image(self, message):
         with self._camera_info_lock:
