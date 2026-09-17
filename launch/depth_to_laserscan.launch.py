@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
 
 """
-depth_to_laserscan_node.launch.py - launch the node converting depth images to laserscan messages.
+depth_to_laserscan.launch.py - launch the node converting depth images to LaserScan messages.
 
 Examples:
-  ros2 launch huskylens2_ros2 depth_to_laserscan_node.launch.py
+    ros2 launch huskylens2_ros2 depth_to_laserscan.launch.py
 
     or
 
