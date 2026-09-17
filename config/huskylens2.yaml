@@ -1,7 +1,7 @@
 
 huskylens2_i2c_node:
   ros__parameters:
-    frame_id:     huskylens2_link
+    frame_id:     huskylens2_link_optical
     i2c_bus:      1        # Raspberry Pi I2C bus (1 = /dev/i2c-1 on RPi4)
     i2c_address:  0x50     # Device responds at this address on this hardware
     algorithm:    'object_recognition'  # Can be overridden in the launch file
@@ -11,7 +11,7 @@ huskylens2_i2c_node:
 
 huskylens2_mcp_node:
   ros__parameters:
-    frame_id:     huskylens2_link
+    frame_id:     huskylens2_link_optical
     camera_module: wide_angle   # stock, wide_angle, or quoted "HFOV,VFOV"
     mcp_server:   "http://huskylens.local:3000"  # MCP server URL (do not include "/sse")
     algorithm_id: 2        # HuskyLens application ID used by self.get_recognition_result (2='object_recognition')

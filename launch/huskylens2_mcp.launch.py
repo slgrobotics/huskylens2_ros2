@@ -89,7 +89,7 @@ def generate_launch_description():
                         '--pitch', '0.0', # Pitch in radians
                         '--yaw', '1.57079632679',   # Yaw in radians (e.g., 1.57079632679 = 90 degrees)
                         '--frame-id', 'map', # Parent frame ID
-                        '--child-frame-id', 'huskylens2_link' # Child frame ID
+                        '--child-frame-id', 'huskylens2_link_optical' # Child frame ID
                     ]
     )
 
