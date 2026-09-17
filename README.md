@@ -281,6 +281,17 @@ For HuskyLens 2 run conversion as follows:
 ros2 launch huskylens2_ros2 point_cloud_node.launch.py
 ```
 
+<img alt="PointCloud2 in RViz" src="https://github.com/user-attachments/assets/646f6037-8f22-4a00-a85c-cb862e898007" />
+
+<img alt="PointCloud2 in RViz axis color" src="https://github.com/user-attachments/assets/752ef786-574f-41e9-82d1-50686b1652a9" />
+
+And, with
+```
+ros2 launch huskylens2_ros2 point_cloud_rgb_node.launch.py
+```
+
+<img alt="PointCloud2 in RViz RGB color" src="https://github.com/user-attachments/assets/39f565d6-7001-4ee3-a5ed-700c432bca81" />
+
 -------------------------
 
 Back to [Main Project Home](https://github.com/slgrobotics/articubot_one/wiki)
