@@ -325,7 +325,7 @@ Values delivered by *depth_server.py* seem to depend on camera FOV, and need som
 (venv) xxx@yyy:~/husky_ws/src/huskylens2_ros2/depth_anything$ ./depth_server.py
 
 # ROS2 node querying HuskyLens 2 MCP Server for image and detections:
-xxx@yyy:~/husky_ws$ ros2 launch huskylens2_ros2 huskylens2_mcp.launch.py camera_module:="stock"
+xxx@yyy:~/husky_ws$ ros2 launch huskylens2_ros2 huskylens2_mcp.launch.py camera_module:="wide_angle"
 
 # ROS2 node takes image and uses HTTP Server to convert camera image to depth map image:
 xxx@yyy:~/husky_ws$ ros2 launch huskylens2_ros2 depth_node.launch.py

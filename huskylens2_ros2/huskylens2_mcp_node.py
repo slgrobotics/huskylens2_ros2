@@ -195,7 +195,7 @@ class HuskyLens2McpNode(Node):
 
     def __init__(self):
         super().__init__('huskylens2_mcp_node')
-        self.declare_parameter('camera_module', 'stock')  # stock or wide_angle
+        self.declare_parameter('camera_module', 'wide_angle')  # stock or wide_angle
         self.declare_parameter('mcp_server', 'http://huskylens.local:3000')
         self.declare_parameter('algorithm_id', 2)
         self.declare_parameter('poll_rate', 10.0)  # actual MCP response rate: about 1 Hz

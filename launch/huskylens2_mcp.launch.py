@@ -5,6 +5,8 @@ huskylens2_mcp.launch.py - launch the LAN-based HuskyLens 2 MCP node
 Examples:
     ros2 launch huskylens2_ros2 huskylens2_mcp.launch.py
     ros2 launch huskylens2_ros2 huskylens2_mcp.launch.py mcp_server:=http://huskylens.local:3000
+    ros2 launch huskylens2_ros2 huskylens2_mcp.launch.py camera_module:="stock"
+    ros2 launch huskylens2_ros2 huskylens2_mcp.launch.py camera_module:="wide_angle"
     ros2 launch huskylens2_ros2 huskylens2_mcp.launch.py camera_module:="92,79"
 
     Note: - the "92,79" was the best I found for HuskyLens 2 wide-angle camera module.
