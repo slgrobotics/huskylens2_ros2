@@ -121,12 +121,17 @@ MODEL_NAME = "depth-anything/Depth-Anything-V2-Metric-Indoor-Base-hf"
 HOST = "127.0.0.1"
 PORT = 5001
 
+# experimental scale factor for depth values:
+DEPTH_MULTIPLIER = 1.15   # for HuskyLens 2 stock camera module
+# DEPTH_MULTIPLIER = 0.5  # for HuskyLens 2 wide-angle camera module
+
 
 # ----------------------------------------------------------------------
 # Initialize model
 # ----------------------------------------------------------------------
 
-print(f"MODEL_NAME: {MODEL_NAME}")
+print(f"DEPTH_MULTIPLIER: {DEPTH_MULTIPLIER}")
+print(f"MODEL_NAME: {MODEL_NAME}", flush=True)
 
 device = "cuda" if torch.cuda.is_available() else "cpu"
 
@@ -286,7 +291,7 @@ def encode_depth_png(depth):
     # Zero is reserved for invalid depth.
 
     depth_mm[valid] = np.clip(
-        np.round(depth[valid] * 1000.0),
+        np.round(depth[valid] * 1000.0 * DEPTH_MULTIPLIER),
         1,
         65535
     ).astype(np.uint16)
@@ -425,18 +430,18 @@ async def depth_endpoint(request: Request):
     ) * 1000.0
 
     min_depth = float(
-        np.min(depth[np.isfinite(depth)])
+        np.min(depth[np.isfinite(depth)]) * DEPTH_MULTIPLIER
     )
 
     max_depth = float(
-        np.max(depth[np.isfinite(depth)])
+        np.max(depth[np.isfinite(depth)]) * DEPTH_MULTIPLIER
     )
 
     print(
         f"{orig_width}x{orig_height}  "
         f"inference={inference_ms:.1f} ms  "
         f"total={total_ms:.1f} ms  "
-        f"depth={min_depth:.2f}-{max_depth:.2f} m  "
+        f"depth={min_depth:.2f} ... {max_depth:.2f} m  "
         f"png={len(png_bytes) / 1024:.1f} KiB"
     )
 

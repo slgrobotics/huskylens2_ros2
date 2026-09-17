@@ -34,10 +34,42 @@ algorithm_id_to_name = {
             11: 'Barcode',
         }
 
+# Here are calculated values for the HuskyLens 2 wide-angle camera module, based on the published horizontal and vertical FOVs.
+# camera_module_fov = {
+#     'stock': (49.12, 38.69),
+#     'wide_angle': (107.6, 72.6),
+# }
+
+# These are experimental values that deliver the best PointCloud2 results:
 camera_module_fov = {
-    'stock': (49.12, 38.69),
-    'wide_angle': (107.6, 72.6),
+    'stock': (47.0, 37.0),
+    'wide_angle': (92.0, 79.0),
 }
+
+
+def parse_camera_fov(camera_module):
+    value = str(camera_module).strip().lower()
+    if value in camera_module_fov:
+        return camera_module_fov[value], value
+
+    try:
+        horizontal_fov, vertical_fov = (
+            float(component.strip()) for component in value.split(','))
+    except (TypeError, ValueError):
+        raise ValueError(
+            f'Invalid camera_module {camera_module!r}; expected stock, '
+            'wide_angle, or "HFOV,VFOV"') from None
+
+    if not (
+        math.isfinite(horizontal_fov)
+        and math.isfinite(vertical_fov)
+        and 0.0 < horizontal_fov < 180.0
+        and 0.0 < vertical_fov < 180.0
+    ):
+        raise ValueError(
+            f'Invalid camera_module FOV {camera_module!r}; '
+            'HFOV and VFOV must be between 0 and 180 degrees')
+    return (horizontal_fov, vertical_fov), value
 
 class McpClient:
     """Small requests-based MCP client using the server's SSE transport."""
@@ -173,7 +205,7 @@ class HuskyLens2McpNode(Node):
         self.declare_parameter('mcp_timeout', 5.0)
 
         self._camera_module = str(
-            self.get_parameter('camera_module').value).strip().lower()
+            self.get_parameter('camera_module').value).strip()
         server = self.get_parameter('mcp_server').value
         self._algorithm_id = int(self.get_parameter('algorithm_id').value)
         self._poll_rate = float(self.get_parameter('poll_rate').value)
@@ -183,14 +215,12 @@ class HuskyLens2McpNode(Node):
         timeout = float(self.get_parameter('mcp_timeout').value)
         self._status_timeout = max(timeout, 0.1)
 
-        if self._camera_module not in camera_module_fov:
-            valid_modules = ', '.join(camera_module_fov)
-            raise ValueError(
-                f'Unknown camera_module {self._camera_module!r}; '
-                f'expected one of: {valid_modules}')
+        self._camera_fov, self._camera_module_name = parse_camera_fov(
+            self._camera_module)
 
-        self.get_logger().info(f'Camera module configured: {self._camera_module}'
-                               f' (FOV: {camera_module_fov[self._camera_module][0]}°W x {camera_module_fov[self._camera_module][1]}°H)')
+        self.get_logger().info(
+            f'Camera module configured: {self._camera_module_name} '
+            f'(FOV: {self._camera_fov[0]}°W x {self._camera_fov[1]}°H)')
 
         self._det_pub = self.create_publisher(
             Detection2DArray, 'huskylens/detections', 10)
@@ -227,7 +257,7 @@ class HuskyLens2McpNode(Node):
         self._camera_info = self._create_camera_info()
 
     def _create_camera_info(self):
-        horizontal_fov, vertical_fov = camera_module_fov[self._camera_module]
+        horizontal_fov, vertical_fov = self._camera_fov
         focal_x = (self._img_w / 2.0) / math.tan(
             math.radians(horizontal_fov / 2.0))
         focal_y = (self._img_h / 2.0) / math.tan(

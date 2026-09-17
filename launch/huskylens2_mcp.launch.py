@@ -5,6 +5,10 @@ huskylens2_mcp.launch.py - launch the LAN-based HuskyLens 2 MCP node
 Examples:
     ros2 launch huskylens2_ros2 huskylens2_mcp.launch.py
     ros2 launch huskylens2_ros2 huskylens2_mcp.launch.py mcp_server:=http://huskylens.local:3000
+    ros2 launch huskylens2_ros2 huskylens2_mcp.launch.py camera_module:="92,79"
+
+    Note: - the "92,79" was the best I found for HuskyLens 2 wide-angle camera module.
+          - depth_server.py has DEPTH_MULTIPLIER = 0.5  # experimental scale factor for depth values
 """
 
 import os
@@ -24,7 +28,7 @@ def generate_launch_description():
     camera_module_arg = DeclareLaunchArgument(
         'camera_module',
         default_value='wide_angle',
-        description='Camera module installed: stock or wide_angle')
+        description='Camera module: stock, wide_angle, or HFOV,VFOV')
 
     algorithm_id_arg = DeclareLaunchArgument(
         'algorithm_id',
@@ -74,6 +78,22 @@ def generate_launch_description():
         ],
     )
 
+    # static transform publisher for RViz2:
+    tf_camera_to_map = Node(package = "tf2_ros", 
+                    executable = "static_transform_publisher",
+                    arguments=[
+                        '--x', '5.0',     # X translation in meters
+                        '--y', '0.0',     # Y translation in meters
+                        '--z', '0.57',    # Z translation in meters (camera height above ground)
+                        '--roll', '-1.57079632679',  # Roll in radians
+                        '--pitch', '0.0', # Pitch in radians
+                        '--yaw', '1.57079632679',   # Yaw in radians (e.g., 1.57079632679 = 90 degrees)
+                        '--frame-id', 'map', # Parent frame ID
+                        '--child-frame-id', 'huskylens2_link' # Child frame ID
+                    ]
+    )
+
+
     return LaunchDescription([
         camera_module_arg,
         algorithm_id_arg,
@@ -81,4 +101,5 @@ def generate_launch_description():
         poll_rate_arg,
         config_arg,
         huskylens_node,
+        tf_camera_to_map
     ])
