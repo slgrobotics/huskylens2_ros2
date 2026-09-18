@@ -146,10 +146,7 @@ The *Depth Anything V2 HTTP Server* in the `depth_anything` directory takes an i
 It must be run in an environment with a GPU (CUDA) - normally a Python
 "sandboxed" *virtual environment* with PyTorch installed.
 
-Make sure you install additional dependencies (in the `venv`):
-```
-pip install fastapi uvicorn
-```
+Refer to [this guide](https://github.com/slgrobotics/huskylens2_ros2/blob/main/depth_anything/README.md) for installation and use.
 
 A ROS2 node or any other program can issue an HTTP POST request to this server
 with an image.
