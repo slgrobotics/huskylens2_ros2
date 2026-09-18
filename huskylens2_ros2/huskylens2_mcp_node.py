@@ -40,10 +40,11 @@ algorithm_id_to_name = {
 #     'wide_angle': (107.6, 72.6),
 # }
 
-# These are experimental values that deliver the best PointCloud2 results:
+# Note: the manufacturer's published FOVs are not applicable for an internally cropped 640×480 image
+#       so the following values were determined experimentally to produce the best PointCloud2 results:
 camera_module_fov = {
     'stock': (47.0, 37.0),
-    'wide_angle': (92.0, 79.0),
+    'wide_angle': (92.0, 76.0),
 }
 
 
