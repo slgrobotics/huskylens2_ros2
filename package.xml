@@ -7,7 +7,6 @@
   <maintainer email="slg@quakemap.com">Sergei Grichine</maintainer>
   <license>TODO</license>
 
-  <buildtool_depend>ament_python</buildtool_depend>
   <exec_depend>rclpy</exec_depend>
   <exec_depend>python3-opencv</exec_depend>
   <exec_depend>ament_index_python</exec_depend>
@@ -21,7 +20,6 @@
   <exec_depend>sensor_msgs</exec_depend>
   <exec_depend>std_msgs</exec_depend>
   <exec_depend>vision_msgs</exec_depend>
-  <exec_depend>pyhuskylens</exec_depend>
   <exec_depend>python3-requests</exec_depend>
 
   <export>
