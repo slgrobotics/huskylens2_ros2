@@ -239,12 +239,16 @@ Depth image returned by *Depth Anything V2 server* and published by *depth_node*
 
 ### Depth To Laser Scan Node
 
-This node subscribes to *depth image* and *CameraInfo* topics, then publishes a
-horizontal *LaserScan*. Each scan ray contains the nearest valid depth sample from the depth image, within the height limits, projected to X,Y plane at a given height.
+This node subscribes to *depth image* and *CameraInfo* topics and publishes a horizontal *LaserScan*. 
+It selects valid depth samples within the configured height limits, projects them onto the horizontal X-Y plane,
+and groups them into uniformly spaced angular scan bins.
+Each scan bin reports the range to the nearest valid depth sample within that angular interval.
 
 ```
 ros2 run huskylens2_ros2 depth_to_laserscan_node
 ```
+
+<img alt="Depth to Laser Scan" src="https://github.com/user-attachments/assets/8ef8a1ad-f89f-4876-9c09-6159d0d71577" />
 
 ### Producing PointCloud2 from Depth topic
 
