@@ -38,6 +38,7 @@ depth_to_laserscan_node:
     input_topic:  huskylens/depth/image
     output_topic: huskylens/scan
     camera_info_topic: huskylens/depth/camera_info
+    num_scan_bins: 160  # good for 640x480 depth image, 4 depth pixels per scan bin
     min_height: -0.1
     max_height: -0.1
     range_min:   0.2

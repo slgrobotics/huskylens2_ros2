@@ -13,6 +13,7 @@ Examples:
     camera_info_topic:=huskylens/depth/camera_info \
     output_topic:=huskylens/scan \
     target_frame:=huskylens2_link_optical \
+    num_scan_bins:=160 \
     min_height:=-0.1 \
     max_height:=0.1 \
     range_min:= 0.2 \
@@ -41,6 +42,10 @@ def generate_launch_description():
     camera_info_topic_arg = DeclareLaunchArgument(
         'camera_info_topic', default_value='huskylens/depth/camera_info',
         description='CameraInfo topic')
+
+    num_scan_bins_arg = DeclareLaunchArgument(
+        'num_scan_bins', default_value='160',
+        description='Number of LaserScan bins (must be at least 10)')
 
     output_topic_arg = DeclareLaunchArgument(
         'output_topic', default_value='huskylens/scan',
@@ -119,6 +124,7 @@ def generate_launch_description():
     return LaunchDescription([
         input_topic_arg,
         camera_info_topic_arg,
+        num_scan_bins_arg,
         output_topic_arg,
         target_frame_arg,
         min_height_arg,
