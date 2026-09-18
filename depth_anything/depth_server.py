@@ -122,8 +122,8 @@ HOST = "127.0.0.1"
 PORT = 5001
 
 # experimental scale factor for depth values:
-DEPTH_MULTIPLIER = 1.15   # for HuskyLens 2 stock camera module
-# DEPTH_MULTIPLIER = 0.5  # for HuskyLens 2 wide-angle camera module
+#DEPTH_MULTIPLIER = 1.15   # for HuskyLens 2 stock camera module
+DEPTH_MULTIPLIER = 0.5  # for HuskyLens 2 wide-angle camera module
 
 
 # ----------------------------------------------------------------------
