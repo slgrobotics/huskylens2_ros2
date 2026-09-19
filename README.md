@@ -76,7 +76,7 @@ git clone https://github.com/slgrobotics/huskylens2_ros2.git
 
 From the workspace root, with your ROS 2 environment sourced:
 ```bash
-cd ~/husky_ws/src
+cd ~/husky_ws
 
 colcon build
   or
