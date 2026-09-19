@@ -10,6 +10,9 @@ Contents:
 - [Device setup](https://github.com/slgrobotics/huskylens2_ros2/blob/main/README.md#device-setup)
 - [Build and run](https://github.com/slgrobotics/huskylens2_ros2#build-and-run)
 - [Camera FOV Specifications (HUSKYLENS 2 Plus Kit)](https://github.com/slgrobotics/huskylens2_ros2#camera-fov-specifications-huskylens-2-plus-kit)
+
+**the following part of code and description are being moved to [image_to_3d package](https://github.com/slgrobotics/image_to_3d)**
+
 - [Depth Anything V2 HTTP Server](https://github.com/slgrobotics/huskylens2_ros2#depth-anything-v2-http-server)
 - [Depth node](https://github.com/slgrobotics/huskylens2_ros2#depth-node)
 - [Depth To Laser Scan node](https://github.com/slgrobotics/huskylens2_ros2#depth-to-laser-scan-node)
