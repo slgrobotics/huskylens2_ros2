@@ -5,7 +5,7 @@
   <version>0.0.1</version>
   <description>Python ROS 2 node for HuskyLens 2 integration.</description>
   <maintainer email="slg@quakemap.com">Sergei Grichine</maintainer>
-  <license>TODO</license>
+  <license>Apache 2.0</license>
 
   <exec_depend>rclpy</exec_depend>
   <exec_depend>python3-opencv</exec_depend>
