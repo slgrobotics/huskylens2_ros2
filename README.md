@@ -11,13 +11,18 @@ Contents:
 - [Build and run](https://github.com/slgrobotics/huskylens2_ros2#build-and-run)
 - [Camera FOV Specifications (HUSKYLENS 2 Plus Kit)](https://github.com/slgrobotics/huskylens2_ros2#camera-fov-specifications-huskylens-2-plus-kit)
 
-**the following part of code and description are being moved to [image_to_3d package](https://github.com/slgrobotics/image_to_3d)**
+**WIP: the following part of code and description are being moved to [image_to_3d package](https://github.com/slgrobotics/image_to_3d)**
 
-- [Depth Anything V2 HTTP Server](https://github.com/slgrobotics/huskylens2_ros2#depth-anything-v2-http-server)
-- [Depth node](https://github.com/slgrobotics/huskylens2_ros2#depth-node)
-- [Depth To Laser Scan node](https://github.com/slgrobotics/huskylens2_ros2#depth-to-laser-scan-node)
-- [Producing PointCloud2 from Depth topic](https://github.com/slgrobotics/huskylens2_ros2#producing-pointcloud2-from-depth-topic)
-- [Calibrating Pointcloud](https://github.com/slgrobotics/huskylens2_ros2#calibrating-pointcloud)
+- [Depth Anything V2 HTTP Server](https://github.com/slgrobotics/huskylens2_ros2#depth-anything-v2-http-server)  ->
+moving [here](https://github.com/slgrobotics/image_to_3d/blob/main/README.md#depth-anything-v2-http-server)
+- [Depth node](https://github.com/slgrobotics/huskylens2_ros2#depth-node)  ->
+moving [here](https://github.com/slgrobotics/image_to_3d/blob/main/README.md#image-to-depth-node)
+- [Depth To Laser Scan node](https://github.com/slgrobotics/huskylens2_ros2#depth-to-laser-scan-node)  ->
+moving [here](https://github.com/slgrobotics/image_to_3d/blob/main/README.md#depth-to-laser-scan-node)
+- [Producing PointCloud2 from Depth topic](https://github.com/slgrobotics/huskylens2_ros2#producing-pointcloud2-from-depth-topic)  ->
+moving [here](https://github.com/slgrobotics/image_to_3d/blob/main/README.md#producing-pointcloud2-from-depth-topic)
+- [Calibrating Pointcloud](https://github.com/slgrobotics/huskylens2_ros2#calibrating-pointcloud)  ->
+moving [here](https://github.com/slgrobotics/image_to_3d/blob/main/README.md#calibrating-pointcloud)
 
 -----------------------------
 
@@ -68,18 +73,19 @@ The `88:31:39:65:34:64` will be the MAC address you can use in your router's *"R
 
 ### Build and run
 
-Place this package in your ROS 2 workspace's `src` directory:
+Place this package and the related *image_to_3d* package in your ROS 2 workspace's `src` directory:
 ```
-mkdir -p ~/husky_ws/src
-cd ~/husky_ws/src
+mkdir -p ~/robot_ws/src
+cd ~/robot_ws/src
 git clone https://github.com/slgrobotics/huskylens2_ros2.git
+git clone https://github.com/slgrobotics/image_to_3d.git
 ```
 
-> **Check out** *~/husky_ws/src/huskylens2_ros2/tests* directory
+> **Check out** *~/robot_ws/src/huskylens2_ros2/tests* directory
 
 From the workspace root, with your ROS 2 environment sourced:
 ```bash
-cd ~/husky_ws
+cd ~/robot_ws
 
 colcon build
   or
@@ -142,6 +148,8 @@ This is how it looks with the *Wide-Angle* camera, included in *Huskylens 2 Plus
 
 ### Depth Anything V2 HTTP Server
 
+> Moving to: https://github.com/slgrobotics/image_to_3d/blob/main/README.md#depth-anything-v2-http-server
+
 See this [guide](https://github.com/slgrobotics/articubot_one/wiki/Depth-Anything-V2) for information.
 
 The *Depth Anything V2 HTTP Server* in the `depth_anything` directory takes an image and returns a depth map (as a .png image).
@@ -189,13 +197,15 @@ A stand-alone `tests/test_depth.py` can directly call Depth Anything V2 model (w
 
 ### Depth node
 
+> Moving to: https://github.com/slgrobotics/image_to_3d/blob/main/README.md#image-to-depth-node
+
 A universal *depth_node* is included in the package. It subscribes to an image topic and queries the *Depth Anything V2 server*, publishing its response as depth maps/images.
 
 This node works with the *HuskyLens 2 MCP node* (`launch/huskylens2_mcp.launch.py`), or any other node publishing compressed images.
 
 Make sure that the Depth Anything V2 server is running, e.g.:
 ```
-  cd ~/husky_ws/src/huskylens2_ros2/depth_anything
+  cd ~/robot_ws/src/huskylens2_ros2/depth_anything
   ... activate your Python 3 virtual environment ...
   ./depth_server.py
 ```
@@ -239,6 +249,8 @@ Depth image returned by *Depth Anything V2 server* and published by *depth_node*
 
 ### Depth To Laser Scan Node
 
+> Moving to: https://github.com/slgrobotics/image_to_3d/blob/main/README.md#depth-to-laser-scan-node
+
 This node subscribes to *depth image* and *CameraInfo* topics and publishes a horizontal *LaserScan*. 
 It selects valid depth samples within the configured height limits, projects them onto the horizontal X-Y plane,
 and groups them into uniformly spaced angular scan bins.
@@ -251,6 +263,8 @@ ros2 run huskylens2_ros2 depth_to_laserscan_node
 <img alt="Depth to Laser Scan" src="https://github.com/user-attachments/assets/8ef8a1ad-f89f-4876-9c09-6159d0d71577" />
 
 ### Producing PointCloud2 from Depth topic
+
+> Moving to: https://github.com/slgrobotics/image_to_3d/blob/main/README.md#producing-pointcloud2-from-depth-topic
 
 The standard ROS 2 package for this is [depth_image_proc](https://github.com/ros-perception/image_pipeline), specifically its *PointCloudXyzNode*. 
 It takes a metric depth *sensor_msgs/Image* plus the corresponding *sensor_msgs/CameraInfo* and publishes *sensor_msgs/PointCloud2*.
@@ -317,6 +331,8 @@ ros2 launch huskylens2_ros2 point_cloud_rgb_node.launch.py
 
 ### Calibrating Pointcloud
 
+> Moving to: https://github.com/slgrobotics/image_to_3d/blob/main/README.md#producing-pointcloud2-from-depth-topic
+
 When viewed in RViz2 over the one meter grid the pointcloud might be significantly distorted.
 
 Values delivered by *depth_server.py* seem to depend on camera FOV, and need some scaling to be brought close to reality.
@@ -326,16 +342,16 @@ Values delivered by *depth_server.py* seem to depend on camera FOV, and need som
 **Note:** You need to run four processes in different terminals (and also RViz2):
 ```
 # "Depth Anything V2" HTTP server waits for an image and returns depth map image:
-(venv) xxx@yyy:~/husky_ws/src/huskylens2_ros2/depth_anything$ ./depth_server.py
+(venv) xxx@yyy:~/robot_ws/src/huskylens2_ros2/depth_anything$ ./depth_server.py
 
 # ROS2 node querying HuskyLens 2 MCP Server for image and detections:
-xxx@yyy:~/husky_ws$ ros2 launch huskylens2_ros2 huskylens2_mcp.launch.py camera_module:="wide_angle"
+xxx@yyy:~/robot_ws$ ros2 launch huskylens2_ros2 huskylens2_mcp.launch.py camera_module:="wide_angle"
 
 # ROS2 node takes image and uses HTTP Server to convert camera image to depth map image:
-xxx@yyy:~/husky_ws$ ros2 launch huskylens2_ros2 depth_node.launch.py
+xxx@yyy:~/robot_ws$ ros2 launch huskylens2_ros2 depth_node.launch.py
 
 # ROS2 node to convert depth map image to PointCloud2:
-xxx@yyy:~/husky_ws$ ros2 launch huskylens2_ros2 point_cloud_rgb_node.launch.py
+xxx@yyy:~/robot_ws$ ros2 launch huskylens2_ros2 point_cloud_rgb_node.launch.py
 ```
 
 The following line in `launch/huskylens2_mcp.launch.py` should match the position of your camera:
