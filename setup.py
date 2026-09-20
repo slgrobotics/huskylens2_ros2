@@ -16,10 +16,10 @@ setup(
     ],
     install_requires=['setuptools', 'pyhuskylens', 'requests'],
     zip_safe=True,
-    maintainer='TODO Maintainer',
-    maintainer_email='maintainer@example.com',
+    maintainer='Sergei Grichine',
+    maintainer_email='slg@quakemap.com',
     description='Python ROS 2 node for HuskyLens 2 integration.',
-    license='TODO',
+    license='Apache 2.0',
     entry_points={
         'console_scripts': [
             'huskylens2_i2c_node = huskylens2_ros2.huskylens2_i2c_node:main',
