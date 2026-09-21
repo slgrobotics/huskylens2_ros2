@@ -10,6 +10,7 @@ Contents:
 - [Device setup](https://github.com/slgrobotics/huskylens2_ros2/blob/main/README.md#device-setup)
 - [Build and run](https://github.com/slgrobotics/huskylens2_ros2#build-and-run)
 - [Camera FOV Specifications (HUSKYLENS 2 Plus Kit)](https://github.com/slgrobotics/huskylens2_ros2#camera-fov-specifications-huskylens-2-plus-kit)
+- [The *Optical* Coordinate System (For Cameras and Sensors)]()
 
 **WIP: the following part of code and description are being moved to [image_to_3d package](https://github.com/slgrobotics/image_to_3d)**
 
@@ -145,6 +146,26 @@ This is how it looks with the *Wide-Angle* camera, included in *Huskylens 2 Plus
 <img alt="Huskylens wide FOV" src="https://github.com/user-attachments/assets/8cc25eaa-5b56-4669-8a06-d5e79aeeeff2" />
 
 **Note:** Huskylens Object Recognition model seems to have difficulty recognizing common objects even in ideal conditions.
+
+### The *Optical* Coordinate System (For Cameras and Sensors)
+
+Cameras view the world from a pixel grid perspective rather than a driving perspective.
+Because of this, REP-103 defines a completely different axis standard for optical frames:
+
+When looking out through the camera lens:
+- Z-Axis: Points Forward (into the scene, acting as the Depth axis)
+- X-Axis: Points Right   (horizontal pixel axis)
+- Y-Axis: Points Down    (vertical pixel axis)
+
+It is different from robot's REP-103 Right-Handed, Z-Up coordinate system:
+- X-Axis (Red in RViz):   Points Forward (the direction the robot drives)
+- Y-Axis (Green in RViz): Points Left
+- Z-Axis (Blue in RViz):  Points Up (against gravity)
+
+So, the camera *body* lives in robot's frame, while the messages `frame_id` contains *optical frame* rotated as follows:
+```
+<origin xyz="0 0 0" rpy="${-pi/2} 0 ${-pi/2}"/>
+```
 
 ### Depth Anything V2 HTTP Server
 
