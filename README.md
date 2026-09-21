@@ -10,7 +10,7 @@ Contents:
 - [Device setup](https://github.com/slgrobotics/huskylens2_ros2/blob/main/README.md#device-setup)
 - [Build and run](https://github.com/slgrobotics/huskylens2_ros2#build-and-run)
 - [Camera FOV Specifications (HUSKYLENS 2 Plus Kit)](https://github.com/slgrobotics/huskylens2_ros2#camera-fov-specifications-huskylens-2-plus-kit)
-- [The *Optical* Coordinate System (For Cameras and Sensors)]()
+- [The *Optical* Coordinate System (For Cameras and Sensors)](https://github.com/slgrobotics/huskylens2_ros2/blob/main/README.md#the-optical-coordinate-system-for-cameras-and-sensors)
 
 **WIP: the following part of code and description are being moved to [image_to_3d package](https://github.com/slgrobotics/image_to_3d)**
 
@@ -166,6 +166,9 @@ So, the camera *body* lives in robot's frame, while the messages `frame_id` cont
 ```
 <origin xyz="0 0 0" rpy="${-pi/2} 0 ${-pi/2}"/>
 ```
+For *HuskyLens 2*, for example, the following frames are present in the TF tree:
+- `huskylens2_link` - location of camera body
+- `huskylens2_link_optical` - the optical frame
 
 ### Depth Anything V2 HTTP Server
 
