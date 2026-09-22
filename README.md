@@ -7,6 +7,7 @@ Uses Python (`ament_python`).
 > Original I2C node (and credits for it to): https://github.com/irayfuego/robotica/blob/main/src/huskylens2_ros2/huskylens2_ros2/huskylens_node.py
 
 Contents:
+- [Published topics](https://github.com/slgrobotics/huskylens2_ros2/blob/main/README.md#published-topics)
 - [Device setup](https://github.com/slgrobotics/huskylens2_ros2/blob/main/README.md#device-setup)
 - [Build and run](https://github.com/slgrobotics/huskylens2_ros2#build-and-run)
 - [Camera FOV Specifications (HUSKYLENS 2 Plus Kit)](https://github.com/slgrobotics/huskylens2_ros2#camera-fov-specifications-huskylens-2-plus-kit)
@@ -15,18 +16,26 @@ Contents:
 > **Note:**
 > - code and description related to converting monocular camera images to 3D (PointCloud2 etc.) have been moved to:
 >   - [image_to_3d package](https://github.com/slgrobotics/image_to_3d)
-> - *huskylens2_mcp_node* publishes the following topics:
->   - `camera/camera_info` | CameraInfo
->   - `camera/image_raw/compressed` | CompressedImage
->   - `huskylens/image/marked` | Image
->   - `huskylens/detections` | Detection2DArray
->   - `huskylens/tracked_object` | Point
->   - `huskylens/algorithm` | String
->   - `huskylens/status` | String  ("up" or "down")
-> - *huskylens2_i2c_node* publishes the following topics, as the image cannot be retrieved over I2C:
->   - `huskylens/detections` | Detection2DArray
->   - `huskylens/tracked_object` | Point
->   - `huskylens/algorithm` | String
+
+-----------------------------
+
+### Published topics
+
+| Node | Topic | Message type | Description |
+|---|---|---|---|
+| `huskylens2_mcp_node` | `camera/camera_info` | `CameraInfo` | Camera calibration information |
+| | `camera/image_raw/compressed` | `CompressedImage` | Compressed camera image |
+| | `huskylens/image/marked` | `Image` | Image with recognition results marked |
+| | `huskylens/detections` | `Detection2DArray` | Object detections |
+| | `huskylens/tracked_object` | `Point` | Tracked object position |
+| | `huskylens/algorithm` | `String` | Active recognition algorithm |
+| | `huskylens/status` | `String` | Connection status (`"up"` or `"down"`) |
+| `huskylens2_i2c_node` | `huskylens/detections` | `Detection2DArray` | Object detections |
+| | `huskylens/tracked_object` | `Point` | Tracked object position |
+| | `huskylens/algorithm` | `String` | Active recognition algorithm |
+
+> **Note:** `huskylens2_i2c_node` does not publish camera images because images cannot be retrieved over I2C.
+
 
 -----------------------------
 
