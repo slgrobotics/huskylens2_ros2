@@ -232,11 +232,11 @@ class HuskyLens2McpNode(Node):
         self._status_pub = self.create_publisher(
             String, 'huskylens/status', 10)
         self._image_pub = self.create_publisher(
-            CompressedImage, 'huskylens/image/compressed', 10)
+            CompressedImage, 'camera/image_raw/compressed', 10)
         self._marked_image_pub = self.create_publisher(
             Image, 'huskylens/image/marked', 10)
         self._camera_info_pub = self.create_publisher(
-            CameraInfo, 'huskylens/camera_info', 10)
+            CameraInfo, 'camera/camera_info', 10)
         self._bridge = CvBridge()
         self._last_marked_time = None
         self._marked_fps = 0.0

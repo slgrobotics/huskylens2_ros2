@@ -16,7 +16,17 @@ Contents:
 > - code and description related to converting monocular camera images to 3D (PointCloud2 etc.) have been moved to:
 >   - [image_to_3d package](https://github.com/slgrobotics/image_to_3d)
 > - *huskylens2_mcp_node* publishes the following topics:
->   - 
+>   - `camera/camera_info` | CameraInfo
+>   - `camera/image_raw/compressed` | CompressedImage
+>   - `huskylens/image/marked` | Image
+>   - `huskylens/detections` | Detection2DArray
+>   - `huskylens/tracked_object` | Point
+>   - `huskylens/algorithm` | String
+>   - `huskylens/status` | String  ("up" or "down")
+> - *huskylens2_i2c_node* publishes the following topics, as the image cannot be retrieved over I2C:
+>   - `huskylens/detections` | Detection2DArray
+>   - `huskylens/tracked_object` | Point
+>   - `huskylens/algorithm` | String
 
 -----------------------------
 
